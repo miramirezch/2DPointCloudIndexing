@@ -13,10 +13,21 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Rtree">
+      <UniqueIdentifier>{9ec07964-2a60-46ab-b1ad-ddf17d3ed9fc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="RtreePointCloudIndex.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="Cloud.h">
+      <Filter>Rtree</Filter>
     </ClInclude>
+    <ClInclude Include="RTreePC.h">
+      <Filter>Rtree</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Example.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
