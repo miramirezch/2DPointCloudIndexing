@@ -16,13 +16,22 @@
     <Filter Include="Rtree">
       <UniqueIdentifier>{9ec07964-2a60-46ab-b1ad-ddf17d3ed9fc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="General">
+      <UniqueIdentifier>{96047c26-ac2d-429f-a54f-264ed55db733}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Cloud.h">
-      <Filter>Rtree</Filter>
-    </ClInclude>
     <ClInclude Include="RTreePC.h">
       <Filter>Rtree</Filter>
+    </ClInclude>
+    <ClInclude Include="Cloud.h">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="Results.h">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="GetCloudsCSV.h">
+      <Filter>General</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

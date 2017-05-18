@@ -1,13 +1,17 @@
 #pragma once
 #include "Cloud.h"
+#include "Results.h"
 #include <boost/geometry.hpp>
 #include <boost/geometry/index/rtree.hpp>
 #include <boost/geometry/index/parameters.hpp>
+#include <chrono>
 #include <utility>
+#include <algorithm>
 #include <unordered_map>
+#include <numeric>
 
 // Miguel Ramirez Chacon
-// 16/05/17
+// 17/05/17
 
 // Index for Point Clouds based in RTree
 // T: Point class(2D)
@@ -23,7 +27,7 @@ public:
 	RtreePC() {}
 
 	// Build index from vector of Point Clouds
-	template<typename C> void Build(std::vector<C> pointClouds)
+	void Build(std::vector<Cloud<T>> pointClouds)
 	{
 		std::vector<PointIdx> data;
 		int totalPoints = 0;
@@ -53,10 +57,10 @@ public:
 		rtree = boost::move(tempRtree);
 	}
 
-	//KNN Query
-	//First Parameter: Query =  PointCloud
-	//Second Parameter: K = Nearest Neighbors
-	std::vector<std::pair<unsigned,unsigned>> KNN(const Cloud<T>& queryCloud, unsigned k) const
+	// KNN Query
+	// First Parameter: Query =  PointCloud
+	// Second Parameter: K = Nearest Neighbors
+	std::vector<std::pair<unsigned,unsigned>> KNN(const Cloud<T>& queryCloud, unsigned k, unsigned internalK) const
 	{		
 		std::vector<PointIdx> results;
 		std::unordered_map<unsigned, unsigned> count;
@@ -64,7 +68,7 @@ public:
 		// K queries for every point in the PointCloud
 		for (const auto& point : queryCloud.Points)
 		{
-			rtree.query(boost::geometry::index::nearest(point, k), std::back_inserter(results));
+			rtree.query(boost::geometry::index::nearest(point, internalK), std::back_inserter(results));
 		}
 
 		// Count the frequencies for the Clouds ID
@@ -91,9 +95,9 @@ public:
 	}
 
 	// Intersection Query
-	//1st Parameter: Query = PointCloud
-	//2nd Parameter: Intersection Window (Box centered in  point)
-	//3rd Parameter: Epsilon = Retrieve all Point Clouds with support > epsilon
+	// 1st Parameter: Query = PointCloud
+	// 2nd Parameter: Intersection Window (Box centered in  point)
+	// 3rd Parameter: Epsilon = Retrieve all Point Clouds with support > epsilon
 	std::vector<std::pair<unsigned, float>> Intersection(const Cloud<T>& queryCloud, const float delta, const float epsilon) const
 	{
 		std::vector<PointIdx> results;
@@ -145,6 +149,74 @@ public:
 		}		
 		return resultsID;
 	}
+
+	// Performance report on KNN Search
+	// Obtain Recall@
+	// Average query time, Standard deviation query time, max query time and min query time
+	template<typename D>Results KNNPerformanceReport(const std::vector<Cloud<T>>& queryClouds, unsigned k, unsigned internalK ,std::vector<unsigned> recallAt) const
+	{
+		Results results;
+		results.QueriesTime.reserve(queryClouds.size());
+		results.RecallAt.reserve(queryClouds.size());
+		std::chrono::time_point<std::chrono::high_resolution_clock> start, end;
+
+		// For every cloud in vector of PointClouds
+		for (const auto cloud : queryClouds)
+		{
+			// Perform KNN search
+			start = std::chrono::high_resolution_clock::now();
+			auto result = KNN(cloud, k, internalK);
+			end = std::chrono::high_resolution_clock::now();
+
+			// Calculate position for Recall@
+			auto it = find_if(result.begin(), result.end(),
+				[ind = cloud.ID](const std::pair<unsigned,unsigned>& elemento) {return elemento.first == ind; });
+
+			if (it != result.end())
+			{
+				auto position = std::distance(result.begin(), it);
+
+				for (const auto& at : recallAt)
+				{
+					if (position <= (at-1))
+					{
+						results.RecallAt[at] = results.RecallAt[at] + 1;
+					}
+				}
+			}
+			results.QueriesTime.push_back(std::chrono::duration_cast<D>(end - start).count());
+		}
+		// Calculate Recall@
+		for (auto& pair : results.RecallAt)
+		{
+			pair.second = pair.second / static_cast<double>(queryClouds.size());
+		}
+
+		// Calculate Min and Max query time
+		auto max_min = std::minmax_element(std::begin(results.QueriesTime), std::end(results.QueriesTime));
+		results.MinQueryTime = *max_min.first;
+		results.MaxQueryTime = *max_min.second;
+
+		// Calculate average query time
+		auto sum = std::accumulate(std::begin(results.QueriesTime), std::end(results.QueriesTime), 0);
+		auto average = sum / results.QueriesTime.size();
+		results.AverageQueryTime = average;
+
+		// Calculate standard deviation - query time		
+		double var = 0;
+		for (auto i = 0; i < results.QueriesTime.size(); i++)
+		{
+			var += (results.QueriesTime[i] - average) * (results.QueriesTime[i] - average);
+		}
+		var = var / (results.QueriesTime.size() - 1);
+		
+		results.SDQueryTime = std::sqrt(var);
+		
+		return results;
+	}
+
+
+
 
 private:
 	boost::geometry::index::rtree<PointIdx, Param> rtree;
