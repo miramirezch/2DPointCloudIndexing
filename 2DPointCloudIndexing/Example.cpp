@@ -17,7 +17,6 @@ namespace bgi = boost::geometry::index;
 // Type Alias
 using Point = bg::model::point<float, 2, boost::geometry::cs::cartesian>;
 
-
 int main()
 {
 	// PointCloud (ID = 100)
@@ -59,22 +58,38 @@ int main()
 	}
 
 	// Test for ReadCSV Function - Get PointClouds from File
-	std::string queriesFileName = "C:\\Users\\Miguel\\Source\\Repos\\2DPointCloudIndexing\\2DPointCloudIndexing\\QueryClouds.csv";
-	std::string indexingFileName = "C:\\Users\\Miguel\\Source\\Repos\\2DPointCloudIndexing\\2DPointCloudIndexing\\IndexingClouds.csv";
-	auto cloudsQuery = ReadCSV<Point>(queriesFileName, 0, 10000, false);
-	auto cloudsIndexing = ReadCSV<Point>(indexingFileName, 0, 10000, false);
+	
+	std::string queriesFileName = "C:\\Succinct Index\\nubes_noise1k.csv";	
+	std::string indexingFileName = "C:\\Succinct Index\\nubes_10k.csv";
+
+	std::cout << "Inicia lectura de archivo de consulta" << std::endl;
+	auto cloudsQuery = ReadCSV<Point>(queriesFileName, 0, 10000, true);
+	std::cout << "Inicia lectura de archivo de indexado" << std::endl;
+	auto cloudsIndexing = ReadCSV<Point>(indexingFileName, 0, 10000, true);
 
 	// Declaration of Rtree for PointCloud
 	RtreePC<Point> rtree2;
 
 	// Index Construction
+	std::cout << "Inicia construccion de indice" << std::endl;
 	rtree2.Build(cloudsIndexing);
 
+
 	// Define wanted Recall@ 
-	std::vector<unsigned> recall{ 1,2 };
+	std::vector<unsigned> recall{1,5,10};
 
 	// Test for function KNNPerformanceReport
-	auto report = rtree2.KNNPerformanceReport<std::chrono::microseconds>(cloudsQuery, 3, 1, recall);
+	std::cout << "Inicia seccion de consulta" << std::endl;
+	auto report = rtree2.KNNPerformanceReport<std::chrono::milliseconds>(cloudsQuery, 20, 1, recall);
+
+	std::cout << "Average Query Time: " << report.AverageQueryTime << '\n';
+
+	for (auto pair : report.RecallAt)
+	{
+		std::cout << "Recall@" << pair.first << " :" << pair.second << '\n';
+	}
+
+	getchar();
 
 	return 0;
 }

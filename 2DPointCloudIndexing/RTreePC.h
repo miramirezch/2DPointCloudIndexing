@@ -106,9 +106,9 @@ public:
 		// Intersection query for every point in the PointCloud
 		for (const auto& point : queryCloud.Points)
 		{
-			// Create a Box for the intersection query
-			auto cx = point.get<0>();
-			auto cy = point.get<1>();
+			// Create a Box for the intersection query			
+			auto cx = boost::geometry::get<0>(point);
+			auto cy = boost::geometry::get<1>(point);
 
 			// Box centered in the point 
 			Box query_box(T(cx - (delta / 2), cy - (delta / 2)), T(cx + (delta / 2), cy + (delta / 2)));
@@ -214,9 +214,6 @@ public:
 		
 		return results;
 	}
-
-
-
 
 private:
 	boost::geometry::index::rtree<PointIdx, Param> rtree;

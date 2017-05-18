@@ -121,6 +121,10 @@
     <ClInclude Include="Results.h" />
     <ClInclude Include="RTreePC.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="PointClouds_1k.csv" />
+    <None Include="PointCloudsNoise_1k.csv" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
