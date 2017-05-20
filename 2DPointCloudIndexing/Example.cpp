@@ -1,5 +1,6 @@
 #include "Cloud.h"
 #include "RTreePC.h"
+#include "IGIPC.h"
 #include "GetCloudsCSV.h"
 #include <iostream>
 #include <boost/geometry/index/rtree.hpp>
@@ -60,7 +61,7 @@ int main()
 	// Test for ReadCSV Function - Get PointClouds from File
 	
 	std::string queriesFileName = "C:\\Succinct Index\\nubes_noise1k.csv";	
-	std::string indexingFileName = "C:\\Succinct Index\\nubes_10k.csv";
+	std::string indexingFileName = "C:\\Succinct Index\\nubes_1k.csv";
 
 	std::cout << "Inicia lectura de archivo de consulta" << std::endl;
 	auto cloudsQuery = ReadCSV<Point>(queriesFileName, 0, 10000, true);
@@ -73,7 +74,6 @@ int main()
 	// Index Construction
 	std::cout << "Inicia construccion de indice" << std::endl;
 	rtree2.Build(cloudsIndexing);
-
 
 	// Define wanted Recall@ 
 	std::vector<unsigned> recall{1,5,10};

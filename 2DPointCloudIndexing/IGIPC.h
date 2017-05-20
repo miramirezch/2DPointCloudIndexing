@@ -42,7 +42,7 @@ public:
 	IGIPC& Add(Cloud<T> pointCloud)
 	{
 		unsigned px, py, cell;
-		for (const auto& point : pointCloud)
+		for (const auto& point : pointCloud.Points)
 		{
 			// Calculate cell of point
 			px = static_cast<unsigned>(std::floor(boost::geometry::get<0>(point) / delta_));
@@ -50,7 +50,7 @@ public:
 			cell = px + static_cast<unsigned>(cmax_ / delta_)*py;
 			
 			// Inverted Index
-			IGI[cell].push_back(point.ID);
+			IGI[cell].push_back(pointCloud.ID);
 		}
 
 		return *this;
@@ -66,15 +66,17 @@ public:
 		unsigned px, py, cell;
 
 		// For every point in the PointCloud 
-		for (const auto& point : queryCloud)
+		for (const auto& point : queryCloud.Points)
 		{
 			px = static_cast<unsigned>(std::floor(boost::geometry::get<0>(point) / delta_));
 			py = static_cast<unsigned>(std::floor(boost::geometry::get<1>(point) / delta_));
 
-			cell = px + static_cast<unsigned>(cmax_ / delta_)*py;			
+			cell = px + static_cast<unsigned>(cmax_ / delta_)*py;	
+
+			auto it = IGI.find(cell);
 
 			// Get List from Inverted Index and count frequency of ID's
-			if (IGI.find(cell) != std::end(IGI))
+			if (it != std::end(IGI))
 			{
 				auto list = it->second;
 				std::for_each(std::begin(list), std::end(list), [&count](unsigned val) { count[val]++; });		
