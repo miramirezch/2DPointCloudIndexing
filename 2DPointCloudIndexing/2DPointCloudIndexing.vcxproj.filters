@@ -19,18 +19,27 @@
     <Filter Include="General">
       <UniqueIdentifier>{96047c26-ac2d-429f-a54f-264ed55db733}</UniqueIdentifier>
     </Filter>
+    <Filter Include="IGI">
+      <UniqueIdentifier>{e3993976-3453-45ab-937c-4b995525520a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="RTreePC.h">
-      <Filter>Rtree</Filter>
-    </ClInclude>
     <ClInclude Include="Cloud.h">
       <Filter>General</Filter>
     </ClInclude>
-    <ClInclude Include="Results.h">
+    <ClInclude Include="GetCloudsCSV.h">
       <Filter>General</Filter>
     </ClInclude>
-    <ClInclude Include="GetCloudsCSV.h">
+    <ClInclude Include="PerformanceReport.h">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="RTreePC.h">
+      <Filter>Rtree</Filter>
+    </ClInclude>
+    <ClInclude Include="IGIPC.h">
+      <Filter>IGI</Filter>
+    </ClInclude>
+    <ClInclude Include="UtilityFunctions.h">
       <Filter>General</Filter>
     </ClInclude>
   </ItemGroup>

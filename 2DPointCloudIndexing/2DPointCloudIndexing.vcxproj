@@ -70,13 +70,14 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\Users\Miguel\Downloads\boost_1_61_0\boost_1_61_0;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\Miguel\Downloads\serialization-develop\serialization-develop\include;C:\MinGW\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>C:\Users\Miguel\Downloads\serialization-develop\serialization-develop\include;C:\MinGW\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -118,8 +119,10 @@
   <ItemGroup>
     <ClInclude Include="Cloud.h" />
     <ClInclude Include="GetCloudsCSV.h" />
-    <ClInclude Include="Results.h" />
+    <ClInclude Include="IGIPC.h" />
+    <ClInclude Include="PerformanceReport.h" />
     <ClInclude Include="RTreePC.h" />
+    <ClInclude Include="UtilityFunctions.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="PointClouds_1k.csv" />

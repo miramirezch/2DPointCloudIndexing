@@ -4,7 +4,7 @@
 // Miguel Ramirez Chacon
 // 17/05/17
 
-struct Results
+struct PerformanceReport
 {
 	std::unordered_map<unsigned, double> RecallAt;
 	std::vector<double> QueriesTime;
