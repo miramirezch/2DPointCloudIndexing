@@ -8,6 +8,7 @@ TODO
 
 ## Current Indexes
 * RTree for PointClouds
+* Inverted Grid Index for PointClouds
 
 ## Requirements
 * A C++11/C++14 compiler such as g++ (4.7 or higher), Visual Studio C++ Compiler.
