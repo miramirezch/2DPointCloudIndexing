@@ -31,5 +31,28 @@ TODO
 ## Licencing
 TODO
 
-## Recomended libraries for Similarity Search
-TODO
+## Recomended libraries
+
+For Similarity Search - Metric Space
+
+Library | URL | Language 
+--- | --- | ---
+SISAP | http://sisap.org/metricspaceslibrary.html | C, Java
+Natix | https://github.com/sadit/natix | C# (.NET Framework)
+Vantage Point Tree | https://github.com/gregorburger/vp-tree | C++
+
+For Similarity Search - Vector Space
+
+Library | URL | Language 
+--- | --- | --- 
+Boost RTree | http://www.boost.org/ | C++
+annoy | https://github.com/spotify/annoy | C++
+FLANN | https://github.com/mariusmuja/flann | C++
+nanoflann | https://github.com/jlblancoc/nanoflann | C++
+FALCONN | https://github.com/FALCONN-LIB/FALCONN | C++
+
+For Succinct Data Structures
+
+Library | URL | Language 
+--- | --- | --- 
+SDSL 2.0 | https://github.com/simongog/sdsl-lite | C++
