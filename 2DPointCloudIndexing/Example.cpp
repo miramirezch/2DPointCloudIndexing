@@ -1,6 +1,7 @@
 #include "Cloud.h"
-#include "RTreePC.h"
-#include "IGIPC.h"
+#include "RTree.h"
+#include "IGI.h"
+#include "ShazamHash.h"
 #include "GetCloudsCSV.h"
 #include <iostream>
 #include <boost/geometry/index/rtree.hpp>
@@ -20,6 +21,10 @@ using Point = bg::model::point<float, 2, boost::geometry::cs::cartesian>;
 
 int main()
 {
+	//---------------------------------------------------------------------------
+	// Getting Started
+	// Examples for Generating a PointCloud and creating a Index on this data	
+
 	// PointCloud (ID = 100)
 	Cloud<Point> cloud(100);
 
@@ -29,18 +34,39 @@ int main()
 	// Vector of PointClouds
 	std::vector<Cloud<Point>> clouds{ cloud };
 
-	// Declaration of Rtree for PointCloud
-	RtreePC<Point> rtree;
-
-	// Index Construction
+	// Rtree for PointClouds -Declaration and construction
+	// Build 1st Parameter - Vector of PointClouds
+	Rtree<Point> rtree("Rtree");	
 	rtree.Build(clouds);
+	
+	// Inverted Grid Index for PointClouds -Declaration and construction
+	// 1st Parameter - Vector of PointClouds
+	// 2nd Parameter - cmax: Upper bound of valid coordinate for the two axis
+	// 3rd Parameter - delta: Dimension of uniform cell
+	IGI<Point> igi(clouds,"IGI",10000,10);
 
-	// KNN Query
-	// First Parameter: Query =  PointCloud
-	// Second Parameter: K = Nearest Neighbors
-	auto resultKNN = rtree.KNN(cloud,20,1);
+	// ShazamHash for PointClouds -Declaration and construction
+	// Parameter for ShazamHash
+	// 1st Parameter - delta: Dimension of uniform cell
+	// 2nd Parameter - DelayX: Delay for Target Zone in X axis
+	// 3rd Parameter - DeltaX: Dimension for Target Zone in X axis
+	// 4th Parameter - DeltaY: Dimension for Target Zone in Y Axis
+	// 5th Parameter - CombinationLimit: Maximum number of tuples for an anchor point and a Target Zone
+	ShazamHashParameters param(1, 0, 100, 100, 1);
+	ShazamHash<Point> shazam(clouds,"Shazam",param);	
 
-	// Print Results of KNN Query
+	//---------------------------------------------------------------------------
+	// Query Example
+
+	// Rtree - KNN Query
+	// 1st Parameter: Query =  PointCloud
+	// 2nd Parameter: K = K Nearest Neighbors PointClouds
+	// 3rd Parameter: internalK = internalK-NN queries per point in PointCloud
+	auto resultKNN = rtree.KNN(cloud,1,1);
+
+	std::cout << "Query Example - Rtree Section" << '\n';
+
+	// Print Results for KNN Query
 	for (auto r : resultKNN)
 	{
 		std::cout << "Cloud: " << r.first << " - Matches: " << r.second << '\n';
@@ -48,8 +74,8 @@ int main()
 
 	// Intersection Query
 	// 1st Parameter: Query = PointCloud
-	// 2nd Parameter: Intersection Window (Box centered in  point)
-	// 3rd Parameter: Epsilon = Retrieve all Point Clouds with support > epsilon
+	// 2nd Parameter: Dimension for Intersection Window (Box centered in  point)
+	// 3rd Parameter: Epsilon = Retrieve all PointClouds with support > epsilon
 	auto resultIntersection = rtree.Intersection(cloud, 1, 0.5);
 
 	// Print Results
@@ -58,36 +84,71 @@ int main()
 		std::cout << "Cloud: " << r.first << " - Support: " << r.second << '\n';
 	}
 
+	std::cout << "--------------------------------------------------" << '\n';
+
+	//---------------------------------------------------------------------------
+	// Obtain PointClouds from CSV File
 	// Test for ReadCSV Function - Get PointClouds from File
+
+	// Expected schema
+	// Example for file with 2 PointClouds
+	// PointCloud 0: 2 2D Points
+	// PointCloud 1: 2 3D Poins
+	//
+	// File.csv
+	// ID, X, Y
+	// 0, 1238.323, 1234.75
+	// 0, 495.234, 423.734
+	// 1, 432.734, 756.856
+	// 1, 7564.234, 543.789
+	// 1, 2342.7345, 7546.231
+
+	std::cout << "Loading PointClouds from CSV File" << '\n';
 	
+	// FileName - Fullpath to CSV File
 	std::string queriesFileName = "C:\\Succinct Index\\nubes_noise1k.csv";	
 	std::string indexingFileName = "C:\\Succinct Index\\nubes_1k.csv";
-
-	std::cout << "Inicia lectura de archivo de consulta" << std::endl;
-	auto cloudsQuery = ReadCSV<Point>(queriesFileName, 0, 10000, true);
-	std::cout << "Inicia lectura de archivo de indexado" << std::endl;
+	
+	// Loading PointClouds from CSV Fiels
+	auto cloudsQuery = ReadCSV<Point>(queriesFileName, 0, 10000, true);	
 	auto cloudsIndexing = ReadCSV<Point>(indexingFileName, 0, 10000, true);
 
-	// Declaration of Rtree for PointCloud
-	RtreePC<Point> rtree2;
+	std::cout << "--------------------------------------------------" << '\n';
 
-	// Index Construction
-	std::cout << "Inicia construccion de indice" << std::endl;
+	//---------------------------------------------------------------------------
+	// Performance Comparation
+	// Data: Indexing 1K PointClouds with ~1000 Point/PointCloud
+	// Query: Same PointClouds from Indexing with ~10% of Noise (Insertions/Deletions)
+	
+	std::cout << "Performance Comparation Section" << '\n';
+
+	std::cout << "Building Indexes" << '\n';
+	// Building Indexes on same data
+
+	// Rtree
+	Rtree<Point> rtree2("Rtree");
 	rtree2.Build(cloudsIndexing);
 
-	// Define wanted Recall@ 
+	// Inverted Grid Index
+	IGI<Point> igi2(cloudsIndexing, "IGI",10000, 10);
+
+	// ShazamHash
+	ShazamHashParameters param2(1, 0, 500, 500, 10);
+	ShazamHash<Point> shazam2(cloudsIndexing, "Shazam",param2);
+
+	// Define wanted recall: In this case, Recall@1, Recall@5, Recall@10 
 	std::vector<unsigned> recall{1,5,10};
 
-	// Test for function KNNPerformanceReport
-	std::cout << "Inicia seccion de consulta" << std::endl;
-	auto report = rtree2.KNNPerformanceReport<std::chrono::milliseconds>(cloudsQuery, 20, 1, recall);
+	// Performance Test	
+	std::cout << "Starting Queries" << std::endl;
+	auto reportRtree = rtree2.KNNPerformanceReport<std::chrono::microseconds>(cloudsQuery, 1, 1, recall);	
+	auto reportIGI = igi2.KNNPerformanceReport<std::chrono::microseconds>(cloudsQuery, 1, recall);
+	auto reportShazam = shazam2.KNNPerformanceReport<std::chrono::microseconds>(cloudsQuery, 1, recall, param2);
 
-	std::cout << "Average Query Time: " << report.AverageQueryTime << '\n';
-
-	for (auto pair : report.RecallAt)
-	{
-		std::cout << "Recall@" << pair.first << " :" << pair.second << '\n';
-	}
+	// Print Performance Report
+	PrintPerformanceReport(reportRtree, rtree2.GetName() ,"us");
+	PrintPerformanceReport(reportIGI,igi2.GetName(),"us");
+	PrintPerformanceReport(reportShazam,shazam2.GetName(), "us");
 
 	getchar();
 

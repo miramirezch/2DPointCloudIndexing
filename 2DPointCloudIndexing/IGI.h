@@ -7,6 +7,7 @@
 #include <utility>
 #include <chrono>
 #include <cmath>
+#include <string>
 
 // Miguel Ramirez Chacon
 // 19/05/17
@@ -15,18 +16,19 @@
 // T: Point class(2D)
 
 template<typename T = boost::geometry::model::point<float, 2, boost::geometry::cs::cartesian>>
-class IGIPC
+class IGI
 {
 private:
-	std::unordered_map<unsigned, std::vector<unsigned>> IGI;
+	std::unordered_map<unsigned, std::vector<unsigned>> IGI_index;
 	std::unordered_map<unsigned, unsigned> sizeClouds;
-	unsigned cmax_;
-	unsigned delta_;
+	std::string name_;
+	const unsigned cmax_;
+	const unsigned delta_;
 
 public:
 	
 	// Build index from vector of Point Clouds
-	IGIPC(std::vector<Cloud<T>> pointClouds, unsigned cmax, unsigned delta) :cmax_{ cmax }, delta_{ delta }
+	IGI(const std::vector<Cloud<T>>& pointClouds, std::string name, const unsigned cmax, const unsigned delta) :name_{ name }, cmax_ { cmax }, delta_{ delta }
 	{
 		for (const auto& cloud : pointClouds)
 		{
@@ -37,9 +39,14 @@ public:
 			Add(cloud);			
 		}
 	}
+
+	std::string GetName()
+	{
+		return name_;
+	}
 	
 	// Add PointCloud to Index
-	IGIPC& Add(Cloud<T> pointCloud)
+	IGI& Add(const Cloud<T>& pointCloud)
 	{
 		unsigned px, py, cell;
 		for (const auto& point : pointCloud.Points)
@@ -50,7 +57,7 @@ public:
 			cell = px + static_cast<unsigned>(cmax_ / delta_)*py;
 			
 			// Inverted Index
-			IGI[cell].push_back(pointCloud.ID);
+			IGI_index[cell].push_back(pointCloud.ID);
 		}
 
 		return *this;
@@ -73,10 +80,10 @@ public:
 
 			cell = px + static_cast<unsigned>(cmax_ / delta_)*py;	
 
-			auto it = IGI.find(cell);
+			auto it = IGI_index.find(cell);
 
 			// Get List from Inverted Index and count frequency of ID's
-			if (it != std::end(IGI))
+			if (it != std::end(IGI_index))
 			{
 				auto list = it->second;
 				std::for_each(std::begin(list), std::end(list), [&count](unsigned val) { count[val]++; });		
@@ -105,11 +112,11 @@ public:
 	// 1st Parameter: Vector of Queries Point Clouds
 	// 2nd Parameter: k = Nearest Neighbors	
 	// 3rd Parameter: recallAt = Vector for desired Recall@
-	template<typename D = std::chrono::milliseconds>PerformanceReport KNNPerformanceReport(const std::vector<Cloud<T>>& queryClouds, unsigned k, std::vector<unsigned> recallAt) const
+	template<typename D = std::chrono::milliseconds>PerformanceReport KNNPerformanceReport(const std::vector<Cloud<T>>& queryClouds, unsigned k, const std::vector<unsigned>& recallAt) const
 	{
-		PerformanceReport results;
-		results.QueriesTime.reserve(queryClouds.size());
-		results.RecallAt.reserve(queryClouds.size());
+		PerformanceReport performance;
+		performance.QueriesTime.reserve(queryClouds.size());
+		performance.RecallAt.reserve(queryClouds.size());
 		std::chrono::time_point<std::chrono::high_resolution_clock> start, end;
 
 		// For every cloud in vector of PointClouds
@@ -120,19 +127,19 @@ public:
 			auto result = KNN(cloud, k);
 			end = std::chrono::high_resolution_clock::now();
 
-			GetRecall(results, result, recallAt, cloud.ID);
+			GetRecall(performance, result, recallAt, cloud.ID);
 
-			results.QueriesTime.push_back(std::chrono::duration_cast<D>(end - start).count());
+			performance.QueriesTime.push_back(std::chrono::duration_cast<D>(end - start).count());
 		}
 		// Calculate Recall@
-		for (auto& pair : results.RecallAt)
+		for (auto& pair : performance.RecallAt)
 		{
 			pair.second = pair.second / static_cast<double>(queryClouds.size());
 		}
 
-		TimePerformance(results);
+		TimePerformance(performance);
 
-		return results;
+		return performance;
 	}
 
 };

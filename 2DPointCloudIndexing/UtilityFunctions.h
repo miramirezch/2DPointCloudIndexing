@@ -2,6 +2,8 @@
 #include "PerformanceReport.h"
 #include <algorithm>
 #include <numeric>
+#include <iostream>
+#include <string>
 // Miguel Ramirez Chacon
 // 19/05/17
 
@@ -27,25 +29,43 @@ void GetRecall(PerformanceReport& results, const std::vector<std::pair<unsigned,
 }
 
 // Function to get Average, Max, Min and SD query time
-void TimePerformance(PerformanceReport& results)
+void TimePerformance(PerformanceReport& report)
 {
 	// Calculate Min and Max query time
-	auto max_min = std::minmax_element(std::begin(results.QueriesTime), std::end(results.QueriesTime));
-	results.MinQueryTime = *max_min.first;
-	results.MaxQueryTime = *max_min.second;
+	auto max_min = std::minmax_element(std::begin(report.QueriesTime), std::end(report.QueriesTime));
+	report.MinQueryTime = *max_min.first;
+	report.MaxQueryTime = *max_min.second;
 
 	// Calculate average query time
-	auto sum = std::accumulate(std::begin(results.QueriesTime), std::end(results.QueriesTime), 0);
-	auto average = sum / results.QueriesTime.size();
-	results.AverageQueryTime = average;
+	auto sum = std::accumulate(std::begin(report.QueriesTime), std::end(report.QueriesTime), 0);
+	auto average = sum / report.QueriesTime.size();
+	report.AverageQueryTime = average;
 
 	// Calculate standard deviation - query time		
 	double var = 0;
-	for (auto i = 0; i < results.QueriesTime.size(); i++)
+	for (auto i = 0; i < report.QueriesTime.size(); i++)
 	{
-		var += (results.QueriesTime[i] - average) * (results.QueriesTime[i] - average);
+		var += (report.QueriesTime[i] - average) * (report.QueriesTime[i] - average);
 	}
-	var = var / (results.QueriesTime.size() - 1);
+	var = var / (report.QueriesTime.size() - 1);
 
-	results.SDQueryTime = std::sqrt(var);
+	report.SDQueryTime = std::sqrt(var);
+}
+
+void PrintPerformanceReport(PerformanceReport& report,std::string name ,std::string timeUnits)
+{
+	std::cout << "-------------------------------------------------------------" << '\n';
+	std::cout << name << '\n';
+	std::cout <<"Query Time: Performance" << '\n';	
+	std::cout << "Query Time - Average: " << report.AverageQueryTime << " " << timeUnits << std::endl;
+	std::cout << "Query Time - Standard Deviation: " << report.SDQueryTime << " " << timeUnits << '\n';
+	std::cout << "Query Time - Maximum: " << report.MaxQueryTime << " " << timeUnits << '\n';
+	std::cout << "Query Time - Minimum: " << report.MinQueryTime << " " << timeUnits << '\n';
+	std::cout << "-------------------------------------------------------------" << '\n';
+	std::cout << name << '\n';
+	std::cout << "Recall - Performance" << '\n';
+	for (const auto pair : report.RecallAt)
+	{
+		std::cout << "Recall@" << pair.first << " :" << pair.second << '\n';
+	}
 }

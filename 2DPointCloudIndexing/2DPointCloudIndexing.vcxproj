@@ -122,10 +122,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Cloud.h" />
+    <ClInclude Include="FingerPrint.h" />
     <ClInclude Include="GetCloudsCSV.h" />
-    <ClInclude Include="IGIPC.h" />
+    <ClInclude Include="IGI.h" />
     <ClInclude Include="PerformanceReport.h" />
-    <ClInclude Include="RTreePC.h" />
+    <ClInclude Include="RTree.h" />
+    <ClInclude Include="ShazamHash.h" />
+    <ClInclude Include="ShazamHashParameters.h" />
     <ClInclude Include="UtilityFunctions.h" />
   </ItemGroup>
   <ItemGroup>

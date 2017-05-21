@@ -22,6 +22,9 @@
     <Filter Include="IGI">
       <UniqueIdentifier>{e3993976-3453-45ab-937c-4b995525520a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ShazamHash">
+      <UniqueIdentifier>{49b28fd7-16b0-4176-8b0e-3bc166e99e99}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Cloud.h">
@@ -33,14 +36,23 @@
     <ClInclude Include="PerformanceReport.h">
       <Filter>General</Filter>
     </ClInclude>
-    <ClInclude Include="RTreePC.h">
-      <Filter>Rtree</Filter>
-    </ClInclude>
-    <ClInclude Include="IGIPC.h">
-      <Filter>IGI</Filter>
-    </ClInclude>
     <ClInclude Include="UtilityFunctions.h">
       <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="IGI.h">
+      <Filter>IGI</Filter>
+    </ClInclude>
+    <ClInclude Include="RTree.h">
+      <Filter>Rtree</Filter>
+    </ClInclude>
+    <ClInclude Include="ShazamHash.h">
+      <Filter>ShazamHash</Filter>
+    </ClInclude>
+    <ClInclude Include="FingerPrint.h">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="ShazamHashParameters.h">
+      <Filter>ShazamHash</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
