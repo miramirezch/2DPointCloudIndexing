@@ -131,6 +131,9 @@
     <ClInclude Include="ShazamHashParameters.h" />
     <ClInclude Include="UtilityFunctions.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="IGI Spark.ipynb" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
