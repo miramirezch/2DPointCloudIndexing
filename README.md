@@ -9,6 +9,7 @@ TODO
 ## Current Indexes
 * RTree for PointClouds
 * Inverted Grid Index for PointClouds
+* ShazamHash: PointCloud index based on the paper: An Industrial-Strength Audio Search Algorithm - Wang 2003
 
 ## Requirements
 * A C++11/C++14 compiler such as g++ (4.7 or higher), Visual Studio C++ Compiler.
