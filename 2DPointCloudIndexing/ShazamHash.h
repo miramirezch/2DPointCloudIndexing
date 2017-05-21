@@ -5,6 +5,8 @@
 #include "UtilityFunctions.h"
 #include "ShazamHashParameters.h"
 #include <boost/geometry.hpp>
+#include <boost/geometry/index/rtree.hpp>
+#include <boost/geometry/index/parameters.hpp>
 #include <vector>
 #include <unordered_map>
 #include <cmath>
@@ -43,6 +45,8 @@ struct key_equal
 template<typename T = boost::geometry::model::point<float, 2, boost::geometry::cs::cartesian>, typename KeyHash = key_hash, typename KeyEqual = key_equal>
 class ShazamHash
 {
+	using Box = boost::geometry::model::box<T>;
+
 private:
 	std::unordered_map<FingerPrint, std::vector<unsigned>, KeyHash, KeyEqual> invertedIndex;
 	std::unordered_map<unsigned, unsigned> sizeClouds;
@@ -54,38 +58,33 @@ private:
 		std::vector<FingerPrint> fingerPrints;
 		fingerPrints.reserve(pointCloud.Points.size()*param.CombinationLimit);
 
-		std::vector<std::pair<unsigned, unsigned>> discretePointCloud;
+		std::vector<T> discretePointCloud;
 		discretePointCloud.reserve(pointCloud.Points.size());
 
 		for (const auto& point : pointCloud.Points)
 		{
-			auto dx = static_cast<unsigned>(std::floor(boost::geometry::get<0>(point) / param.Delta));
-			auto dy = static_cast<unsigned>(std::floor(boost::geometry::get<1>(point) / param.Delta));
-			discretePointCloud.push_back(std::make_pair(dx, dy));
+			auto dx = std::floor(boost::geometry::get<0>(point) / param.Delta);
+			auto dy = std::floor(boost::geometry::get<1>(point) / param.Delta);
+			discretePointCloud.push_back(T(dx,dy));
 		}
 
-		unsigned low_x, high_x, low_y, high_y;
-		unsigned pointX, pointY;
-
+		boost::geometry::index::rtree<T, boost::geometry::index::rstar<20, 10>> rtree(std::begin(discretePointCloud), std::end(discretePointCloud));
+		
+		unsigned low_x, high_x, low_y, high_y;	
 
 		for (const auto& anchor : discretePointCloud)
 		{
-
-			low_x = anchor.first + param.DelayX;
+			low_x = boost::geometry::get<0>(anchor) + param.DelayX;
 			high_x = low_x + param.DeltaX;
-			low_y = anchor.second - static_cast<unsigned>(param.DeltaY / 2);
-			high_y = anchor.second + static_cast<unsigned>(param.DeltaY / 2);
+			low_y = boost::geometry::get<1>(anchor) - static_cast<unsigned>(param.DeltaY / 2);
+			high_y = boost::geometry::get<1>(anchor) + static_cast<unsigned>(param.DeltaY / 2);
 
-			std::vector<std::pair<unsigned, unsigned>> tempPoints;
+			Box targetZone(T(low_x, low_y), T(high_x, high_y));
 
-			for (const auto& point : discretePointCloud)
-			{
-				if (point.first > low_x && point.first < high_x && point.second >low_y && point.second < high_y)
-				{
-					tempPoints.push_back(point);
-				}
-			}
+			std::vector<T> tempPoints;
 
+			rtree.query(boost::geometry::index::intersects(targetZone), std::back_inserter(tempPoints));
+						
 			auto length = 0;
 			if (param.CombinationLimit < tempPoints.size())
 			{
@@ -96,17 +95,16 @@ private:
 				length = tempPoints.size();
 			}
 
-			std::vector<std::pair<unsigned, unsigned>> tempPoints2(length);
+			std::vector<T> tempPoints2(length);
 
 			std::partial_sort_copy(std::begin(tempPoints), std::end(tempPoints), std::begin(tempPoints2), std::end(tempPoints2),
-				[](const std::pair<unsigned, unsigned>& p1, const std::pair<unsigned, unsigned>& p2) {
-				return p1.first < p2.first;
+				[](const T& p1, const T& p2) {
+				return boost::geometry::get<0>(p1) < boost::geometry::get<0>(p2);
 			});
 
 			for (const auto& p : tempPoints2)
 			{
-
-				FingerPrint fingerPrint(anchor.second, p.second, p.first - anchor.first);
+				FingerPrint fingerPrint(boost::geometry::get<1>(anchor), boost::geometry::get<1>(p), boost::geometry::get<0>(p) - boost::geometry::get<0>(anchor));
 				fingerPrints.push_back(fingerPrint);
 			}
 		}
@@ -213,3 +211,69 @@ public:
 
 };
 
+/*
+std::vector<FingerPrint> GetFingerPrints(const Cloud<T>& pointCloud, ShazamHashParameters param) const
+{
+std::vector<FingerPrint> fingerPrints;
+fingerPrints.reserve(pointCloud.Points.size()*param.CombinationLimit);
+
+std::vector<std::pair<unsigned, unsigned>> discretePointCloud;
+discretePointCloud.reserve(pointCloud.Points.size());
+
+for (const auto& point : pointCloud.Points)
+{
+auto dx = static_cast<unsigned>(std::floor(boost::geometry::get<0>(point) / param.Delta));
+auto dy = static_cast<unsigned>(std::floor(boost::geometry::get<1>(point) / param.Delta));
+discretePointCloud.push_back(std::make_pair(dx, dy));
+}
+
+unsigned low_x, high_x, low_y, high_y;
+unsigned pointX, pointY;
+
+
+for (const auto& anchor : discretePointCloud)
+{
+
+low_x = anchor.first + param.DelayX;
+high_x = low_x + param.DeltaX;
+low_y = anchor.second - static_cast<unsigned>(param.DeltaY / 2);
+high_y = anchor.second + static_cast<unsigned>(param.DeltaY / 2);
+
+std::vector<std::pair<unsigned, unsigned>> tempPoints;
+
+for (const auto& point : discretePointCloud)
+{
+if (point.first > low_x && point.first < high_x && point.second >low_y && point.second < high_y)
+{
+tempPoints.push_back(point);
+}
+}
+
+auto length = 0;
+if (param.CombinationLimit < tempPoints.size())
+{
+length = param.CombinationLimit;
+}
+else
+{
+length = tempPoints.size();
+}
+
+std::vector<std::pair<unsigned, unsigned>> tempPoints2(length);
+
+std::partial_sort_copy(std::begin(tempPoints), std::end(tempPoints), std::begin(tempPoints2), std::end(tempPoints2),
+[](const std::pair<unsigned, unsigned>& p1, const std::pair<unsigned, unsigned>& p2) {
+return p1.first < p2.first;
+});
+
+for (const auto& p : tempPoints2)
+{
+
+FingerPrint fingerPrint(anchor.second, p.second, p.first - anchor.first);
+fingerPrints.push_back(fingerPrint);
+}
+}
+return fingerPrints;
+}
+
+*/
