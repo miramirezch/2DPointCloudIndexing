@@ -60,8 +60,4 @@
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="PointClouds_1k.csv" />
-    <None Include="PointCloudsNoise_1k.csv" />
-  </ItemGroup>
 </Project>
