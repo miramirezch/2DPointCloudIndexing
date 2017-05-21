@@ -9,6 +9,7 @@ TODO
 ## Current Indexes
 * RTree for PointClouds
 * Inverted Grid Index for PointClouds
+* Inverted Grid Index for PointClouds in Apache Spark (Pyspark - Spark SQL)
 * ShazamHash: PointCloud index based on the paper: An Industrial-Strength Audio Search Algorithm - Wang 2003
 
 ## Requirements
