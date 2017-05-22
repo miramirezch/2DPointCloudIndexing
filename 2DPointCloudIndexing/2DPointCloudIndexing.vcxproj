@@ -126,6 +126,7 @@
     <ClInclude Include="GetCloudsCSV.h" />
     <ClInclude Include="IGI.h" />
     <ClInclude Include="IGIRtree.h" />
+    <ClInclude Include="IGIVpt.h" />
     <ClInclude Include="PerformanceReport.h" />
     <ClInclude Include="RTree.h" />
     <ClInclude Include="ShazamHash.h" />

@@ -31,6 +31,9 @@
     <Filter Include="IGIRtree">
       <UniqueIdentifier>{56f5f383-45f7-41af-98d6-7015cdccd024}</UniqueIdentifier>
     </Filter>
+    <Filter Include="IGIVpt">
+      <UniqueIdentifier>{bad90f93-ce7f-411c-8de5-cd804f84fa66}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Cloud.h">
@@ -68,6 +71,9 @@
     </ClInclude>
     <ClInclude Include="IGIRtree.h">
       <Filter>IGIRtree</Filter>
+    </ClInclude>
+    <ClInclude Include="IGIVpt.h">
+      <Filter>IGIVpt</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

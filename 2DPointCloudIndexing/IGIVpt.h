@@ -1,29 +1,21 @@
 #pragma once
-#include "Cloud.h"
+#include "vp-tree.h"
 #include "PerformanceReport.h"
+#include "Cloud.h"
 #include <boost/geometry.hpp>
-#include <boost/geometry/index/rtree.hpp>
-#include <boost/geometry/index/parameters.hpp>
 #include <unordered_map>
 #include <vector>
+#include <memory>
 #include <chrono>
-#include <string>
 
-// Miguel Ramirez Chacon
-// 22/05/17
 
-// Index for Point Clouds based in combination of Inverted Grid Index and RTree
-// T: Point class(2D)
-// Param: Rtree configuration
-
-template<typename T = boost::geometry::model::point<float, 2, boost::geometry::cs::cartesian>, typename Param = boost::geometry::index::rstar<20, 10>>
-class IGIRtree
+template<typename T, double(*distance)(const std::pair<T, unsigned>&, const std::pair<T, unsigned>&)>
+class IGIVpt
 {
 	using PointIdx = std::pair<T, unsigned>;
 
 private:
-
-	std::unordered_map<unsigned, boost::geometry::index::rtree<PointIdx, Param>> igiRtree;
+	std::unordered_map<unsigned, std::unique_ptr<VpTree<PointIdx, distance>>> igiVPT;
 	std::unordered_map<unsigned, unsigned> sizeClouds;
 	std::string name_;
 	const unsigned cmax_;
@@ -31,17 +23,17 @@ private:
 
 public:
 
-	// Build index from vector of PointClouds
-	IGIRtree(const std::vector<Cloud<T>>& pointClouds, std::string name, const unsigned cmax, const unsigned delta) :name_{ name }, cmax_{ cmax }, delta_{ delta }
+	IGIVpt(const std::vector<Cloud<T>>& pointClouds, std::string name, const unsigned cmax, const unsigned delta) :name_{ name }, cmax_{ cmax }, delta_{ delta }
 	{
 		std::unordered_map<unsigned, std::vector<PointIdx>> pointsWithinCell;
 		PointsWithinCell(pointClouds, pointsWithinCell);
 
 		for (const auto& pair : pointsWithinCell)
 		{
-			// Create a Rtree for every cell
-			boost::geometry::index::rtree<PointIdx, Param> tempRtree(std::begin(pair.second), std::end(pair.second));
-			igiRtree.insert({ pair.first, boost::move(tempRtree) });
+			// Create a VPT for every cell
+			auto tempVPT = std::make_unique<VpTree<PointIdx, distance>>();
+			tempVPT->create(pair.second);
+			igiVPT[pair.first] = std::move(tempVPT);					
 		}
 	}
 
@@ -76,11 +68,11 @@ public:
 	// KNN Query
 	// 1st Parameter: Query =  PointCloud
 	// 2nd Parameter: K = K Nearest Neighbors PointClouds
-	// 3rd Parameter: internalK = internalK-NN queries per point in PointCloud
-	std::vector<std::pair<unsigned, unsigned>> KNN(const Cloud<T>& queryCloud, const unsigned k, const unsigned internalK) const
+	std::vector<std::pair<unsigned, unsigned>> KNN(const Cloud<T>& queryCloud, const unsigned k) const
 	{
 		std::unordered_map<unsigned, unsigned> count;
 		std::vector<PointIdx> results;
+		std::vector<double> distances;
 
 		unsigned px, py, cell;
 
@@ -92,28 +84,30 @@ public:
 
 			cell = px + static_cast<unsigned>(cmax_ / delta_)*py;
 
-			auto it = igiRtree.find(cell);
+			auto it = igiVPT.find(cell);
 
 			// Get List from Inverted Index and count frequency of ID's
-			if (it != std::end(igiRtree))
-			{				
-				(it->second).query(boost::geometry::index::nearest(point, internalK), std::back_inserter(results));
+			if (it != std::end(igiVPT))
+			{
+				(it->second)->search(std::make_pair(point, 0), k, &results, &distances);
+
+				// Count the frequencies for the Clouds ID
+				for (const auto& item : results)
+				{
+					count[item.second]++;
+				}
+
+				results.clear();
+				distances.clear();				
 			}
 		}
-
-		// Count the frequencies for the Clouds ID
-		for (const auto& item : results)
-		{
-			count[item.second]++;
-		}
-
+		
 		auto numberResults = 0;
 
 		if (count.size() > k)
 			numberResults = k;
 		else
 			numberResults = count.size();
-
 
 		std::vector<std::pair<unsigned, unsigned>> resultsID(numberResults);
 
@@ -124,15 +118,13 @@ public:
 		return resultsID;
 	}
 
-
 	// Performance report on KNN Search
 	// Obtain Recall@
 	// Average query time, Standard deviation query time, max query time and min query time
 	// 1st Parameter: Vector of Queries Point Clouds
-	// 2nd Parameter: k = Nearest Neighbors
-	// 3rd Parameter: internalK = Internal k parameter for internalK-NN 
-	// 4th Parameter: recallAt = Vector for desired Recall@
-	template<typename D = std::chrono::milliseconds>PerformanceReport KNNPerformanceReport(const std::vector<Cloud<T>>& queryClouds, const unsigned k, const unsigned internalK, const std::vector<unsigned>& recallAt) const
+	// 2nd Parameter: k = Nearest Neighbors	
+	// 3rd Parameter: recallAt = Vector for desired Recall@
+	template<typename Duration = std::chrono::milliseconds>PerformanceReport KNNPerformanceReport(const std::vector<Cloud<T>>& queryClouds, const unsigned k, const std::vector<unsigned>& recallAt) const
 	{
 		PerformanceReport performance;
 		performance.QueriesTime.reserve(queryClouds.size());
@@ -144,12 +136,12 @@ public:
 		{
 			// Perform KNN search
 			start = std::chrono::high_resolution_clock::now();
-			auto result = KNN(cloud, k, internalK);
+			auto result = KNN(cloud, k);
 			end = std::chrono::high_resolution_clock::now();
 
 			GetRecall(performance, result, recallAt, cloud.ID);
 
-			performance.QueriesTime.push_back(std::chrono::duration_cast<D>(end - start).count());
+			performance.QueriesTime.push_back(std::chrono::duration_cast<Duration>(end - start).count());
 		}
 		// Calculate Recall@
 		for (auto& pair : performance.RecallAt)
@@ -161,6 +153,7 @@ public:
 
 		return performance;
 	}
+
 
 
 

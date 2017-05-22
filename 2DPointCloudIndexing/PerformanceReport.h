@@ -7,7 +7,7 @@
 struct PerformanceReport
 {
 	std::unordered_map<unsigned, double> RecallAt;
-	std::vector<double> QueriesTime;
+	std::vector<int> QueriesTime;
 	double AverageQueryTime;
 	double SDQueryTime;
 	double MaxQueryTime;

@@ -38,7 +38,7 @@ void TimePerformance(PerformanceReport& report)
 
 	// Calculate average query time
 	auto sum = std::accumulate(std::begin(report.QueriesTime), std::end(report.QueriesTime), 0);
-	auto average = sum / report.QueriesTime.size();
+	auto average = static_cast<double>(sum) / report.QueriesTime.size();
 	report.AverageQueryTime = average;
 
 	// Calculate standard deviation - query time		

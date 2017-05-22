@@ -3,6 +3,7 @@
 #include "IGI.h"
 #include "VPT.h"
 #include "IGIRtree.h"
+#include "IGIVpt.h"
 #include "ShazamHash.h"
 #include "GetCloudsCSV.h"
 #include <iostream>
@@ -77,6 +78,13 @@ int main()
 	// 3rd Parameter - cmax: Upper bound of valid coordinate for the two axis
 	// 4th Parameter - delta: Dimension of uniform cell
 	IGIRtree<Point> igiRtree(clouds, "IGIRtree", 10000, 10);
+
+	// IGIVpt for PointClouds -Declaration and construction	
+	// 1st Parameter - Vector of PointClouds
+	// 2nd Parameter  - Name of Index
+	// 3rd Parameter - cmax: Upper bound of valid coordinate for the two axis
+	// 4th Parameter - delta: Dimension of uniform cell
+	IGIVpt<Point, DistL2> igiVPT(clouds, "IGIVpt", 10000, 10);
 
 	//---------------------------------------------------------------------------
 	// Query Example
@@ -166,6 +174,9 @@ int main()
 	// IGIRtree
 	IGIRtree<Point> igiRtree2(cloudsIndexing, "IGIRtree", 10000, 10);
 
+	// IGIVpt
+	IGIVpt<Point, DistL2> igiVPT2(cloudsIndexing, "IGIVpt", 10000, 10);
+
 	// Define wanted recall: In this case, Recall@1, Recall@5, Recall@10 
 	std::vector<unsigned> recall{1,5,10};
 
@@ -176,6 +187,8 @@ int main()
 	auto reportShazam = shazam2.KNNPerformanceReport<std::chrono::microseconds>(cloudsQuery, 1, recall, param2);
 	auto reportVPT = vpt2.KNNPerformanceReport<std::chrono::microseconds>(cloudsQuery, 1, recall);
 	auto reportIGIRtree = igiRtree2.KNNPerformanceReport<std::chrono::microseconds>(cloudsQuery, 1, 1, recall);
+	auto reportIGIVpt = igiVPT2.KNNPerformanceReport<std::chrono::microseconds>(cloudsQuery, 1, recall);
+
 
 	// Print Performance Report
 	PrintPerformanceReport(reportRtree, rtree2.GetName() ,"us");
@@ -183,6 +196,7 @@ int main()
 	PrintPerformanceReport(reportShazam,shazam2.GetName(), "us");
 	PrintPerformanceReport(reportVPT, vpt2.GetName(), "us");
 	PrintPerformanceReport(reportIGIRtree, igiRtree2.GetName(), "us");
+	PrintPerformanceReport(reportIGIVpt, igiVPT2.GetName(), "us");
 
 	getchar();
 
