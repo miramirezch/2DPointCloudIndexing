@@ -24,6 +24,12 @@ class Rtree
 	using PointIdx =  std::pair<T, unsigned>;
 	using Box = boost::geometry::model::box<T>;
 
+private:
+
+	boost::geometry::index::rtree<PointIdx, Param> rtree;
+	std::unordered_map<unsigned, unsigned> sizeClouds;
+	std::string name_;
+
 
 public:
 
@@ -195,11 +201,5 @@ public:
 		
 		return performance;
 	}
-
-private:
-	
-	boost::geometry::index::rtree<PointIdx, Param> rtree;
-	std::unordered_map<unsigned, unsigned> sizeClouds;
-	std::string name_;
 };
 

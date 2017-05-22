@@ -28,6 +28,9 @@
     <Filter Include="VPT">
       <UniqueIdentifier>{e4da7292-a91c-4dd5-9673-557eb6ec4fbf}</UniqueIdentifier>
     </Filter>
+    <Filter Include="IGIRtree">
+      <UniqueIdentifier>{56f5f383-45f7-41af-98d6-7015cdccd024}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Cloud.h">
@@ -62,6 +65,9 @@
     </ClInclude>
     <ClInclude Include="vp-tree.h">
       <Filter>VPT</Filter>
+    </ClInclude>
+    <ClInclude Include="IGIRtree.h">
+      <Filter>IGIRtree</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

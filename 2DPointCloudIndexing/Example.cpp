@@ -2,6 +2,7 @@
 #include "RTree.h"
 #include "IGI.h"
 #include "VPT.h"
+#include "IGIRtree.h"
 #include "ShazamHash.h"
 #include "GetCloudsCSV.h"
 #include <iostream>
@@ -11,8 +12,6 @@
 
 // Miguel Ramirez Chacon
 // Example for 2D Point Cloud Indexing
-// Index based in RTree
-// 16/05/17
 
 // Namespaces
 namespace bg = boost::geometry;
@@ -47,7 +46,7 @@ int main()
 	std::vector<Cloud<Point>> clouds{ cloud };
 
 	// Rtree for PointClouds -Declaration and construction
-	// Build 1st Parameter - Vector of PointClouds
+	// 1st Parameter - Vector of PointClouds
 	Rtree<Point> rtree("Rtree");	
 	rtree.Build(clouds);
 	
@@ -67,10 +66,17 @@ int main()
 	ShazamHashParameters param(1, 0, 100, 100, 1);
 	ShazamHash<Point> shazam(clouds,"Shazam",param);	
 
-	// Vantage Point Tree for PointClouds -Declaration and construction
-	// Build 1st Parameter - Vector of PointClouds
+	// Vantage Point Tree for PointClouds -Declaration and construction	
 	VPT<Point, DistL2> vpt("VPT");
+	// 1st Parameter - Vector of PointClouds
 	vpt.Build(clouds);
+
+	// IGIRtree for PointClouds -Declaration and construction	
+	// 1st Parameter - Vector of PointClouds
+	// 2nd Parameter  - Name of Index
+	// 3rd Parameter - cmax: Upper bound of valid coordinate for the two axis
+	// 4th Parameter - delta: Dimension of uniform cell
+	IGIRtree<Point> igiRtree(clouds, "IGIRtree", 10000, 10);
 
 	//---------------------------------------------------------------------------
 	// Query Example
@@ -157,6 +163,9 @@ int main()
 	VPT<Point, DistL2> vpt2("Vantage Point Tree");
 	vpt2.Build(cloudsIndexing);
 
+	// IGIRtree
+	IGIRtree<Point> igiRtree2(cloudsIndexing, "IGIRtree", 10000, 10);
+
 	// Define wanted recall: In this case, Recall@1, Recall@5, Recall@10 
 	std::vector<unsigned> recall{1,5,10};
 
@@ -166,12 +175,14 @@ int main()
 	auto reportIGI = igi2.KNNPerformanceReport<std::chrono::microseconds>(cloudsQuery, 1, recall);
 	auto reportShazam = shazam2.KNNPerformanceReport<std::chrono::microseconds>(cloudsQuery, 1, recall, param2);
 	auto reportVPT = vpt2.KNNPerformanceReport<std::chrono::microseconds>(cloudsQuery, 1, recall);
+	auto reportIGIRtree = igiRtree2.KNNPerformanceReport<std::chrono::microseconds>(cloudsQuery, 1, 1, recall);
 
 	// Print Performance Report
 	PrintPerformanceReport(reportRtree, rtree2.GetName() ,"us");
 	PrintPerformanceReport(reportIGI,igi2.GetName(),"us");
 	PrintPerformanceReport(reportShazam,shazam2.GetName(), "us");
 	PrintPerformanceReport(reportVPT, vpt2.GetName(), "us");
+	PrintPerformanceReport(reportIGIRtree, igiRtree2.GetName(), "us");
 
 	getchar();
 
