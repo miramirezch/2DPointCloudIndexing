@@ -12,6 +12,7 @@ TODO
 * Inverted Grid Index for PointClouds in Apache Spark (Pyspark - Spark SQL)
 * ShazamHash: PointCloud index based on the paper: An Industrial-Strength Audio Search Algorithm - Wang 2003
 * Vantage Point Tree for PointClouds
+* Inverted Grid Index + Rtree for PointClouds
 
 ## Requirements
 * A C++11/C++14 compiler such as g++ (4.7 or higher), Visual Studio Community 2017 C++ Compiler.
