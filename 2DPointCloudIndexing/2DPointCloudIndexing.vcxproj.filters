@@ -25,6 +25,9 @@
     <Filter Include="ShazamHash">
       <UniqueIdentifier>{49b28fd7-16b0-4176-8b0e-3bc166e99e99}</UniqueIdentifier>
     </Filter>
+    <Filter Include="VPT">
+      <UniqueIdentifier>{e4da7292-a91c-4dd5-9673-557eb6ec4fbf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Cloud.h">
@@ -53,6 +56,12 @@
     </ClInclude>
     <ClInclude Include="ShazamHashParameters.h">
       <Filter>ShazamHash</Filter>
+    </ClInclude>
+    <ClInclude Include="VPT.h">
+      <Filter>VPT</Filter>
+    </ClInclude>
+    <ClInclude Include="vp-tree.h">
+      <Filter>VPT</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
