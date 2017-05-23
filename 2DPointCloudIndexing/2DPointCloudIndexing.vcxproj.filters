@@ -34,6 +34,9 @@
     <Filter Include="IGIVpt">
       <UniqueIdentifier>{bad90f93-ce7f-411c-8de5-cd804f84fa66}</UniqueIdentifier>
     </Filter>
+    <Filter Include="SuccinctIGI">
+      <UniqueIdentifier>{82b51045-b00d-4e66-b9e3-85b8fae0b9a4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Cloud.h">
@@ -74,6 +77,9 @@
     </ClInclude>
     <ClInclude Include="IGIVpt.h">
       <Filter>IGIVpt</Filter>
+    </ClInclude>
+    <ClInclude Include="SuccintIGI.h">
+      <Filter>SuccinctIGI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

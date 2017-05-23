@@ -5,6 +5,7 @@
 #include "IGIRtree.h"
 #include "IGIVpt.h"
 #include "ShazamHash.h"
+#include "SuccinctIGI.h"
 #include "GetCloudsCSV.h"
 #include <iostream>
 #include <cmath>
@@ -86,6 +87,8 @@ int main()
 	// 4th Parameter - delta: Dimension of uniform cell
 	IGIVpt<Point, DistL2> igiVPT(clouds, "IGIVpt", 10000, 10);
 
+	SuccinctIGI<Point> sIGI(clouds, "SuccinctIGI",10000,10);
+
 	//---------------------------------------------------------------------------
 	// Query Example
 
@@ -137,8 +140,8 @@ int main()
 	std::cout << "Loading PointClouds from CSV File" << '\n';
 	
 	// FileName - Fullpath to CSV File
-	std::string queriesFileName = "C:\\Succinct Index\\nubes_noise1k.csv";	
-	std::string indexingFileName = "C:\\Succinct Index\\nubes_1k.csv";
+	std::string queriesFileName = "nubes_noise1k.csv";
+	std::string indexingFileName = "nubes_10k.csv";
 	
 	// Loading PointClouds from CSV Fiels
 	auto cloudsQuery = ReadCSV<Point>(queriesFileName, 0, 10000, true);	
@@ -177,17 +180,21 @@ int main()
 	// IGIVpt
 	IGIVpt<Point, DistL2> igiVPT2(cloudsIndexing, "IGIVpt", 10000, 10);
 
+	// SuccinctIGI
+	SuccinctIGI<Point> sIGI2(cloudsIndexing, "SuccinctIGI",10000,10);
+
 	// Define wanted recall: In this case, Recall@1, Recall@5, Recall@10 
 	std::vector<unsigned> recall{1,5,10};
 
 	// Performance Test	
 	std::cout << "Starting Queries" << std::endl;
-	auto reportRtree = rtree2.KNNPerformanceReport<std::chrono::microseconds>(cloudsQuery, 1, 1, recall);	
+	auto reportRtree = rtree2.KNNPerformanceReport<std::chrono::microseconds>(cloudsQuery, 1, 1, recall);
 	auto reportIGI = igi2.KNNPerformanceReport<std::chrono::microseconds>(cloudsQuery, 1, recall);
 	auto reportShazam = shazam2.KNNPerformanceReport<std::chrono::microseconds>(cloudsQuery, 1, recall, param2);
 	auto reportVPT = vpt2.KNNPerformanceReport<std::chrono::microseconds>(cloudsQuery, 1, recall);
 	auto reportIGIRtree = igiRtree2.KNNPerformanceReport<std::chrono::microseconds>(cloudsQuery, 1, 1, recall);
 	auto reportIGIVpt = igiVPT2.KNNPerformanceReport<std::chrono::microseconds>(cloudsQuery, 1, recall);
+	auto reportSuccinctIGI = sIGI2.KNNPerformanceReport<std::chrono::microseconds>(cloudsQuery, 1, recall);
 
 
 	// Print Performance Report
@@ -197,6 +204,7 @@ int main()
 	PrintPerformanceReport(reportVPT, vpt2.GetName(), "us");
 	PrintPerformanceReport(reportIGIRtree, igiRtree2.GetName(), "us");
 	PrintPerformanceReport(reportIGIVpt, igiVPT2.GetName(), "us");
+	PrintPerformanceReport(reportSuccinctIGI, sIGI2.GetName(), "us");
 
 	getchar();
 
