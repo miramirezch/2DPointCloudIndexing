@@ -15,9 +15,7 @@
 
 // Index for Point Clouds based in Vantage Point Tree
 // T: Point class(2D)
-// D: Distance Function
-//double(*distance)(const T&, const T&)
-
+// D: Distance Function (Metric)
 
 template<typename T, double(*distance)(const std::pair<T, unsigned>&, const std::pair<T, unsigned>&)>
 class VPT

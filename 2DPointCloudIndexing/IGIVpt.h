@@ -8,6 +8,12 @@
 #include <memory>
 #include <chrono>
 
+// Miguel Ramirez Chacon
+// 22/05/17
+
+// Index for Point Clouds based in combination of Inverted Grid Index and Vantage Point Tree
+// T: Point class(2D)
+// D: Distance Function (Metric)
 
 template<typename T, double(*distance)(const std::pair<T, unsigned>&, const std::pair<T, unsigned>&)>
 class IGIVpt
