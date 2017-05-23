@@ -78,7 +78,7 @@
     <ClInclude Include="IGIVpt.h">
       <Filter>IGIVpt</Filter>
     </ClInclude>
-    <ClInclude Include="SuccintIGI.h">
+    <ClInclude Include="SuccinctIGI.h">
       <Filter>SuccinctIGI</Filter>
     </ClInclude>
   </ItemGroup>

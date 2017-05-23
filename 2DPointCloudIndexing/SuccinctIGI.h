@@ -18,9 +18,10 @@
 // T: Point class(2D)
 
 template<typename T = boost::geometry::model::point<float, 2, boost::geometry::cs::cartesian>>
-class SuccinctIGI{
+class SuccinctIGI
+{
 private:
-	std::unordered_map<unsigned,sdsl::sd_vector<>> succinctIGI;
+	std::unordered_map<unsigned, sdsl::sd_vector<>> succinctIGI;
 	std::unordered_map<unsigned, unsigned> sizeClouds;
 	std::unordered_map<unsigned, unsigned> onesPerBitmap;
 	const std::string name_;
@@ -29,9 +30,9 @@ private:
 
 public:
 
-	SuccinctIGI(const std::vector<Cloud<T>>& pointClouds, std::string name, const unsigned cmax, const unsigned delta) :name_{ name }, cmax_ { cmax }, delta_{ delta }
+	SuccinctIGI(const std::vector<Cloud<T>>& pointClouds, std::string name, const unsigned cmax, const unsigned delta) :name_{ name }, cmax_{ cmax }, delta_{ delta }
 	{
-		std::unordered_map<unsigned,std::set<unsigned>> tempIGI;		
+		std::unordered_map<unsigned, std::set<unsigned>> tempIGI;
 
 		for (const auto& cloud : pointClouds)
 		{
@@ -39,26 +40,26 @@ public:
 			sizeClouds[cloud.ID] = cloud.Points.size();
 
 			// Add cloud to index
-			Add(cloud, tempIGI);			
+			Add(cloud, tempIGI);
 		}
 
 		// For every cell
-		for (const auto& pair:tempIGI)
+		for (const auto& pair : tempIGI)
 		{
 			// Generate bitmap
-			sdsl::bit_vector bitmap = sdsl::bit_vector(pointClouds.size(), 0);	
+			sdsl::bit_vector bitmap = sdsl::bit_vector(pointClouds.size(), 0);
 
 			// For every ID in set 
-			for(const auto& id: pair.second)
+			for (const auto& id : pair.second)
 			{
-				bitmap[id] = 1;				
+				bitmap[id] = 1;
 			}
 
 			// Generate SArray from bitmap
-			sdsl::sd_vector<> sarray(bitmap);			
+			sdsl::sd_vector<> sarray(bitmap);
 			succinctIGI[pair.first] = sarray;
 			// Number or 1's per bitmap
-			sdsl::sd_vector<>::rank_1_type sarray_rank(&sarray);			
+			sdsl::sd_vector<>::rank_1_type sarray_rank(&sarray);
 			onesPerBitmap[pair.first] = sarray_rank(sarray.size());
 		}
 	}
@@ -69,7 +70,7 @@ public:
 	}
 
 	// Add PointCloud to Index
-	void Add(const Cloud<T>& pointCloud, std::unordered_map<unsigned,std::set<unsigned>>& tempIGI)
+	void Add(const Cloud<T>& pointCloud, std::unordered_map<unsigned, std::set<unsigned>>& tempIGI)
 	{
 		unsigned px, py, cell;
 		for (const auto& point : pointCloud.Points)
@@ -81,7 +82,7 @@ public:
 
 			// Inverted Index
 			tempIGI[cell].insert(pointCloud.ID);
-		}		
+		}
 	}
 
 	// KNN Query
@@ -93,7 +94,7 @@ public:
 
 		unsigned px, py, cell;
 
-		std::unordered_map<unsigned,sdsl::sd_vector<>> listSarrays;
+		std::unordered_map<unsigned, sdsl::sd_vector<>> listSarrays;
 		listSarrays.reserve(queryCloud.Points.size());
 
 		// For every point in the PointCloud
@@ -112,8 +113,8 @@ public:
 				sdsl::sd_vector<>::select_1_type select_sarray(&(it->second));
 				auto it = onesPerBitmap.find(cell);
 				auto ones = it->second;
-				unsigned i{1};
-				while(i<ones)
+				unsigned i{ 1 };
+				while (i<ones)
 				{
 					count[select_sarray(i)]++;
 					i++;
@@ -132,7 +133,7 @@ public:
 
 		// Get k approximate nearest neighbors
 		std::partial_sort_copy(std::begin(count), std::end(count), std::begin(resultsID), std::end(resultsID),
-				[](const std::pair<unsigned, unsigned>& left, const std::pair<unsigned, unsigned>& right) {return left.second>right.second; });
+			[](const std::pair<unsigned, unsigned>& left, const std::pair<unsigned, unsigned>& right) {return left.second>right.second; });
 
 		return resultsID;
 
@@ -177,38 +178,3 @@ public:
 
 
 };
-
-
-
-/*
- * for (const auto& point : queryCloud.Points)
-		{
-			px = static_cast<unsigned>(std::floor(boost::geometry::get<0>(point) / delta_));
-			py = static_cast<unsigned>(std::floor(boost::geometry::get<1>(point) / delta_));
-
-			cell = px + static_cast<unsigned>(cmax_ / delta_)*py;
-
-			auto it = succinctIGI.find(cell);
-
-			// Get Sarray from Inverted Index
-			if (it != std::end(succinctIGI))
-			{
-				auto prelimSarray = it->second;
-				sdsl::sd_vector<>::select_1_type select_sarray(&prelimSarray);
-				auto it = onesPerBitmap.find(cell);
-				auto ones = it->second;
-
-				unsigned i{1};
-				while(i<ones)
-				{
-					results.push_back(select_sarray(i));
-					i++;
-				}
-			}
-		}
-
-
-		std::for_each(std::begin(results), std::end(results), [&count](unsigned val) { count[val]++; });
-
- *
- */
