@@ -14,8 +14,8 @@ class IGIVpt
 {
 	using PointIdx = std::pair<T, unsigned>;
 
-private:
-	std::unordered_map<unsigned, std::unique_ptr<VpTree<PointIdx, distance>>> igiVPT;
+private:	
+	std::unordered_map<unsigned, VpTree<PointIdx, distance>> igiVPT;
 	std::unordered_map<unsigned, unsigned> sizeClouds;
 	std::string name_;
 	const unsigned cmax_;
@@ -30,10 +30,8 @@ public:
 
 		for (const auto& pair : pointsWithinCell)
 		{
-			// Create a VPT for every cell
-			auto tempVPT = std::make_unique<VpTree<PointIdx, distance>>();
-			tempVPT->create(pair.second);
-			igiVPT[pair.first] = std::move(tempVPT);					
+			// Create a VPT for every cell						
+			igiVPT[pair.first].create(pair.second);
 		}
 	}
 
@@ -88,8 +86,8 @@ public:
 
 			// Get List from Inverted Index and count frequency of ID's
 			if (it != std::end(igiVPT))
-			{
-				(it->second)->search(std::make_pair(point, 0), k, &results, &distances);
+			{				
+				(it->second).search(std::make_pair(point, 0), k, &results, &distances);
 
 				// Count the frequencies for the Clouds ID
 				for (const auto& item : results)
