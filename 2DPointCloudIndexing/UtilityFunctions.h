@@ -28,6 +28,28 @@ void GetRecall(PerformanceReport& results, const std::vector<std::pair<unsigned,
 	}
 }
 
+// Function to Get recall@k1,k2,...kn
+void GetRecall(PerformanceReport& results, const std::vector<std::pair<unsigned, double>>& result, const std::vector<unsigned>& recallAt, unsigned cloudID)
+{
+	// Calculate position for Recall@
+	auto it = find_if(result.begin(), result.end(),
+		[ind = cloudID](const std::pair<unsigned, double>& elemento) {return elemento.first == ind; });
+
+	if (it != result.end())
+	{
+		auto position = std::distance(result.begin(), it);
+
+		for (const auto& at : recallAt)
+		{
+			if (position <= (at - 1))
+			{
+				results.RecallAt[at] = results.RecallAt[at] + 1;
+			}
+		}
+	}
+}
+
+
 // Function to get Average, Max, Min and SD query time
 void TimePerformance(PerformanceReport& report)
 {

@@ -7,8 +7,11 @@
 #include "ShazamHash.h"
 #include "SuccinctIGI.h"
 #include "GetCloudsCSV.h"
+#include "SarrayVPT.h"
+#include "SarrayMetrics.h"
 #include <iostream>
 #include <cmath>
+#include <boost/functional/hash.hpp>
 #include <boost/geometry/index/rtree.hpp>
 #include <boost/geometry/index/parameters.hpp>
 
@@ -88,6 +91,9 @@ int main()
 	IGIVpt<Point, DistL2> igiVPT(clouds, "IGIVpt", 10000, 10);
 
 	SuccinctIGI<Point> sIGI(clouds, "SuccinctIGI",10000,10);
+
+	SarrayVPT<Point,HammingDistance> sarrayVPT("SarrayVPT",10000,10);
+	sarrayVPT.Build(clouds);
 
 	//---------------------------------------------------------------------------
 	// Query Example
@@ -183,6 +189,10 @@ int main()
 	// SuccinctIGI
 	SuccinctIGI<Point> sIGI2(cloudsIndexing, "SuccinctIGI",10000,10);
 
+	// SarrayVPT
+	SarrayVPT<Point,HammingDistance> sarrayVPT2("SarrayVPT",10000,10);
+	sarrayVPT2.Build(cloudsIndexing);
+
 	// Define wanted recall: In this case, Recall@1, Recall@5, Recall@10 
 	std::vector<unsigned> recall{1,5,10};
 
@@ -191,10 +201,12 @@ int main()
 	auto reportRtree = rtree2.KNNPerformanceReport<std::chrono::microseconds>(cloudsQuery, 1, 1, recall);
 	auto reportIGI = igi2.KNNPerformanceReport<std::chrono::microseconds>(cloudsQuery, 1, recall);
 	auto reportShazam = shazam2.KNNPerformanceReport<std::chrono::microseconds>(cloudsQuery, 1, recall, param2);
-	auto reportVPT = vpt2.KNNPerformanceReport<std::chrono::microseconds>(cloudsQuery, 1, recall);
+	auto reportVPT = vpt2.KNNPerformanceReport<std::chrono::microseconds>(cloudsQuery, 1,1,recall);
 	auto reportIGIRtree = igiRtree2.KNNPerformanceReport<std::chrono::microseconds>(cloudsQuery, 1, 1, recall);
-	auto reportIGIVpt = igiVPT2.KNNPerformanceReport<std::chrono::microseconds>(cloudsQuery, 1, recall);
+	auto reportIGIVpt = igiVPT2.KNNPerformanceReport<std::chrono::microseconds>(cloudsQuery, 1,1 ,recall);
 	auto reportSuccinctIGI = sIGI2.KNNPerformanceReport<std::chrono::microseconds>(cloudsQuery, 1, recall);
+        std::cout<<"Inicio Sarray VPT"<<std::endl;
+	auto reportSarrayVPT = sarrayVPT2.KNNPerformanceReport<std::chrono::microseconds>(cloudsQuery,1,1,recall);
 
 
 	// Print Performance Report
@@ -205,6 +217,7 @@ int main()
 	PrintPerformanceReport(reportIGIRtree, igiRtree2.GetName(), "us");
 	PrintPerformanceReport(reportIGIVpt, igiVPT2.GetName(), "us");
 	PrintPerformanceReport(reportSuccinctIGI, sIGI2.GetName(), "us");
+	PrintPerformanceReport(reportSarrayVPT, sarrayVPT2.GetName(), "us");
 
 	getchar();
 

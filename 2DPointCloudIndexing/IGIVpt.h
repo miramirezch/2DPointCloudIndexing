@@ -72,7 +72,8 @@ public:
 	// KNN Query
 	// 1st Parameter: Query =  PointCloud
 	// 2nd Parameter: K = K Nearest Neighbors PointClouds
-	std::vector<std::pair<unsigned, unsigned>> KNN(const Cloud<T>& queryCloud, const unsigned k) const
+	// 3rd Parameter: internalK-NN
+	std::vector<std::pair<unsigned, unsigned>> KNN(const Cloud<T>& queryCloud, const unsigned k, const unsigned internalK) const
 	{
 		std::unordered_map<unsigned, unsigned> count;
 		std::vector<PointIdx> results;
@@ -93,7 +94,7 @@ public:
 			// Get List from Inverted Index and count frequency of ID's
 			if (it != std::end(igiVPT))
 			{				
-				(it->second).search(std::make_pair(point, 0), k, &results, &distances);
+				(it->second).search(std::make_pair(point, 0), internalK, &results, &distances);
 
 				// Count the frequencies for the Clouds ID
 				for (const auto& item : results)
@@ -126,9 +127,10 @@ public:
 	// Obtain Recall@
 	// Average query time, Standard deviation query time, max query time and min query time
 	// 1st Parameter: Vector of Queries Point Clouds
-	// 2nd Parameter: k = Nearest Neighbors	
+	// 2nd Parameter: k = Nearest Neighbors
+	// 3rd Parameter: internalK-NN
 	// 3rd Parameter: recallAt = Vector for desired Recall@
-	template<typename Duration = std::chrono::milliseconds>PerformanceReport KNNPerformanceReport(const std::vector<Cloud<T>>& queryClouds, const unsigned k, const std::vector<unsigned>& recallAt) const
+	template<typename Duration = std::chrono::milliseconds>PerformanceReport KNNPerformanceReport(const std::vector<Cloud<T>>& queryClouds, const unsigned k,const unsigned internalK ,const std::vector<unsigned>& recallAt) const
 	{
 		PerformanceReport performance;
 		performance.QueriesTime.reserve(queryClouds.size());
@@ -140,7 +142,7 @@ public:
 		{
 			// Perform KNN search
 			start = std::chrono::high_resolution_clock::now();
-			auto result = KNN(cloud, k);
+			auto result = KNN(cloud, k, internalK);
 			end = std::chrono::high_resolution_clock::now();
 
 			GetRecall(performance, result, recallAt, cloud.ID);

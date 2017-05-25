@@ -24,7 +24,6 @@ class VPT
 
 private:	
 	VpTree<PointIdx,distance> vpt;
-
 	std::unordered_map<unsigned, unsigned> sizeClouds;
 	std::string name_;
 
@@ -67,7 +66,7 @@ public:
 	// 1st Parameter: Query =  PointCloud
 	// 2nd Parameter: K = K Nearest Neighbors PointClouds
 	// 3rd Parameter: internalK = internalK-NN queries per point in PointCloud
-	std::vector<std::pair<unsigned, unsigned>> KNN(const Cloud<T>& queryCloud, const unsigned k) const
+	std::vector<std::pair<unsigned, unsigned>> KNN(const Cloud<T>& queryCloud, const unsigned k, const unsigned internalK) const
 	{
 		std::vector<PointIdx> results;
 		std::vector<double> distances;
@@ -76,7 +75,7 @@ public:
 		// K queries for every point in the PointCloud
 		for (const auto& point : queryCloud.Points)
 		{
-			vpt.search(std::make_pair(point,1), k, &results, &distances);
+			vpt.search(std::make_pair(point,1), internalK, &results, &distances);
 
 			// Count the frequencies for the Clouds ID
 			for (const auto& item : results)
@@ -109,8 +108,9 @@ public:
 	// Average query time, Standard deviation query time, max query time and min query time
 	// 1st Parameter: Vector of Queries Point Clouds
 	// 2nd Parameter: k = Nearest Neighbors	
+	// 3rd Parameter: internalK = internalK-NN
 	// 3rd Parameter: recallAt = Vector for desired Recall@
-	template<typename Duration = std::chrono::milliseconds>PerformanceReport KNNPerformanceReport(const std::vector<Cloud<T>>& queryClouds, const unsigned k,const std::vector<unsigned>& recallAt) const
+	template<typename Duration = std::chrono::milliseconds>PerformanceReport KNNPerformanceReport(const std::vector<Cloud<T>>& queryClouds, const unsigned k, const unsigned internalK,const std::vector<unsigned>& recallAt) const
 	{
 		PerformanceReport performance;
 		performance.QueriesTime.reserve(queryClouds.size());
@@ -122,7 +122,7 @@ public:
 		{
 			// Perform KNN search
 			start = std::chrono::high_resolution_clock::now();
-			auto result = KNN(cloud, k);			
+			auto result = KNN(cloud, k, internalK);
 			end = std::chrono::high_resolution_clock::now();
 
 			GetRecall(performance, result, recallAt, cloud.ID);
