@@ -37,6 +37,9 @@
     <Filter Include="SuccinctIGI">
       <UniqueIdentifier>{82b51045-b00d-4e66-b9e3-85b8fae0b9a4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="SarrayVPT">
+      <UniqueIdentifier>{376b42ad-82af-424a-b91f-bd5fbb95c7f9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Cloud.h">
@@ -80,6 +83,12 @@
     </ClInclude>
     <ClInclude Include="SuccinctIGI.h">
       <Filter>SuccinctIGI</Filter>
+    </ClInclude>
+    <ClInclude Include="SarrayMetrics.h">
+      <Filter>SarrayVPT</Filter>
+    </ClInclude>
+    <ClInclude Include="SarrayVPT.h">
+      <Filter>SarrayVPT</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

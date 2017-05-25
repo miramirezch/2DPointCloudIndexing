@@ -18,8 +18,7 @@ class SarrayVPT
 
 private:	
 	VpTree<PointIdx,distance> vpt;	
-	std::unordered_map<unsigned, unsigned> sizeClouds;
-	//std::unordered_map<unsigned, unsigned> onesPerBitmap;
+	std::unordered_map<unsigned, unsigned> sizeClouds;	
 	std::string name_;
 	const unsigned cmax_;
 	const unsigned delta_;
@@ -78,11 +77,7 @@ public:
 		}
 
 		// Generate SArray from bitmap
-		sdsl::sd_vector<> sarray(bitmap);
-
-		// Number or 1's per bitmap
-		//sdsl::sd_vector<>::rank_1_type sarray_rank(&sarray);
-		//onesPerBitmap[pointCloud.ID] = sarray_rank(sarray.size());
+		sdsl::sd_vector<> sarray(bitmap);		
 
 		return sarray;
 	}
@@ -122,10 +117,8 @@ public:
 		for (const auto& cloud : queryClouds)
 		{
 			// Perform KNN search
-			start = std::chrono::high_resolution_clock::now();
-                        std::cout<<"Inicio KNN search"<<std::endl;
-			auto result = KNN(cloud, k, internalK);
-                        std::cout<<"Inicio KNN search"<<std::endl;
+			start = std::chrono::high_resolution_clock::now();                        
+			auto result = KNN(cloud, k, internalK);                       
 			end = std::chrono::high_resolution_clock::now();
 
 			GetRecall(performance, result, recallAt, cloud.ID);
