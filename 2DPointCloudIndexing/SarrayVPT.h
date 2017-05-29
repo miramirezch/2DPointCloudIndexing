@@ -23,20 +23,20 @@ class SarrayVPT
 {
 	using PointIdx = std::pair<sdsl::sd_vector<>, unsigned>;
 
-private:	
+private:
 	VptPointers<PointIdx, distance> vpt;
-	std::unordered_map<unsigned, unsigned> sizeClouds;	
+	std::unordered_map<unsigned, unsigned> sizeClouds;
 	std::string name_;
 	const unsigned cmax_;
 	const unsigned delta_;
 
 public:
 
-	SarrayVPT(std::string name, unsigned cmax, unsigned delta) :name_{ name },cmax_{ cmax }, delta_{ delta } {}
+	SarrayVPT(std::string name, unsigned cmax, unsigned delta) :name_{ name }, cmax_{ cmax }, delta_{ delta } {}
 
-	void Build(const std::vector<Cloud<T>>& pointClouds, std::function<double(const std::pair<T, unsigned>&, const std::pair<T, unsigned>&)> dist)
+	void Build(const std::vector<Cloud<T>>& pointClouds)
 	{
-		int totalPoints {0};
+		int totalPoints{ 0 };
 		std::vector<PointIdx> data;
 
 		// Get the total of points from all Point Clouds
@@ -51,7 +51,7 @@ public:
 		// Prepare data to Indexing - Add the Cloud ID to every Point
 		for (const auto& cloud : pointClouds)
 		{
-			data.push_back(std::make_pair(GenerateSarray(cloud),cloud.ID));			
+			data.push_back(std::make_pair(GenerateSarray(cloud), cloud.ID));
 		}
 
 		// Generate Index
@@ -59,11 +59,11 @@ public:
 	}
 
 	sdsl::sd_vector<> GenerateSarray(const Cloud<T>& pointCloud) const
-	{		
+	{
 		unsigned px, py, position;
-		std::set<unsigned> positions;		
+		std::set<unsigned> positions;
 
-		for(const auto& point: pointCloud.Points)
+		for (const auto& point : pointCloud.Points)
 		{
 			// Calculate cell of point
 			px = static_cast<unsigned>(std::floor(boost::geometry::get<0>(point) / delta_));
@@ -74,7 +74,7 @@ public:
 		}
 
 		// Generate bitmap
-		auto size_bitmap = (cmax_/delta_)*(cmax_/delta_);
+		auto size_bitmap = (cmax_ / delta_)*(cmax_ / delta_);
 		sdsl::bit_vector bitmap = sdsl::bit_vector(size_bitmap, 0);
 
 		// For every position in Positions 
@@ -84,12 +84,12 @@ public:
 		}
 
 		// Generate SArray from bitmap
-		sdsl::sd_vector<> sarray(bitmap);		
+		sdsl::sd_vector<> sarray(bitmap);
 
 		return sarray;
 	}
 
-	std::string GetName(){return name_;}
+	std::string GetName() { return name_; }
 
 	// KNN Query
 	// 1st Parameter: Query =  PointCloud
@@ -100,20 +100,20 @@ public:
 		std::vector<PointIdx> results;
 		std::vector<double> distances;
 
-		vpt.search(std::make_pair(GenerateSarray(queryCloud),0), internalK, results, distances);
+		vpt.search(std::make_pair(GenerateSarray(queryCloud), 0), internalK, &results, &distances);
 
-		std::vector<std::pair<unsigned, double>> neighbors; 
-		neighbors.reserve(k);		
+		std::vector<std::pair<unsigned, double>> neighbors;
+		neighbors.reserve(k);
 
-		for(int i{0}; i<results.size();i++)
+		for (int i{ 0 }; i<results.size(); i++)
 		{
-			neighbors.push_back(std::make_pair(results[i].second,distances[i]));			
-		}	
+			neighbors.push_back(std::make_pair(results[i].second, distances[i]));
+		}
 
 		return neighbors;
 	}
 
-	template<typename Duration = std::chrono::milliseconds>PerformanceReport KNNPerformanceReport(const std::vector<Cloud<T>>& queryClouds, const unsigned k,const unsigned internalK ,const std::vector<unsigned>& recallAt) const
+	template<typename Duration = std::chrono::milliseconds>PerformanceReport KNNPerformanceReport(const std::vector<Cloud<T>>& queryClouds, const unsigned k, const unsigned internalK, const std::vector<unsigned>& recallAt) const
 	{
 		PerformanceReport performance;
 		performance.QueriesTime.reserve(queryClouds.size());
@@ -124,8 +124,8 @@ public:
 		for (const auto& cloud : queryClouds)
 		{
 			// Perform KNN search
-			start = std::chrono::high_resolution_clock::now();                        
-			auto result = KNN(cloud, k, internalK);                       
+			start = std::chrono::high_resolution_clock::now();
+			auto result = KNN(cloud, k, internalK);
 			end = std::chrono::high_resolution_clock::now();
 
 			GetRecall(performance, result, recallAt, cloud.ID);

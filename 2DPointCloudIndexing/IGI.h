@@ -26,9 +26,9 @@ private:
 	const unsigned delta_;
 
 public:
-	
+
 	// Build index from vector of Point Clouds
-	IGI(const std::vector<Cloud<T>>& pointClouds, std::string name, const unsigned cmax, const unsigned delta) :name_{ name }, cmax_ { cmax }, delta_{ delta }
+	IGI(const std::vector<Cloud<T>>& pointClouds, std::string name, const unsigned cmax, const unsigned delta) :name_{ name }, cmax_{ cmax }, delta_{ delta }
 	{
 		for (const auto& cloud : pointClouds)
 		{
@@ -36,7 +36,7 @@ public:
 			sizeClouds[cloud.ID] = cloud.Points.size();
 
 			// Add cloud to index
-			Add(cloud);			
+			Add(cloud);
 		}
 	}
 
@@ -44,7 +44,7 @@ public:
 	{
 		return name_;
 	}
-	
+
 	// Add PointCloud to Index
 	IGI& Add(const Cloud<T>& pointCloud)
 	{
@@ -55,7 +55,7 @@ public:
 			px = static_cast<unsigned>(std::floor(boost::geometry::get<0>(point) / delta_));
 			py = static_cast<unsigned>(std::floor(boost::geometry::get<1>(point) / delta_));
 			cell = px + static_cast<unsigned>(cmax_ / delta_)*py;
-			
+
 			// Inverted Index
 			IGI_index[cell].push_back(pointCloud.ID);
 		}
@@ -67,7 +67,7 @@ public:
 	// First Parameter: queryCloud =  PointCloud
 	// Second Parameter: k = Nearest Neighbors
 	std::vector<std::pair<unsigned, unsigned>> KNN(const Cloud<T>& queryCloud, unsigned k) const
-	{		
+	{
 		std::unordered_map<unsigned, unsigned> count;
 
 		unsigned px, py, cell;
@@ -78,7 +78,7 @@ public:
 			px = static_cast<unsigned>(std::floor(boost::geometry::get<0>(point) / delta_));
 			py = static_cast<unsigned>(std::floor(boost::geometry::get<1>(point) / delta_));
 
-			cell = px + static_cast<unsigned>(cmax_ / delta_)*py;	
+			cell = px + static_cast<unsigned>(cmax_ / delta_)*py;
 
 			auto it = IGI_index.find(cell);
 
@@ -86,9 +86,9 @@ public:
 			if (it != std::end(IGI_index))
 			{
 				auto list = it->second;
-				std::for_each(std::begin(list), std::end(list), [&count](unsigned val) { count[val]++; });		
-			}			
-		}	
+				std::for_each(std::begin(list), std::end(list), [&count](unsigned val) { count[val]++; });
+			}
+		}
 
 		auto numberResults = 0;
 
@@ -98,11 +98,11 @@ public:
 			numberResults = count.size();
 
 		std::vector<std::pair<unsigned, unsigned>> resultsID(numberResults);
-		
+
 		// Get k approximate nearest neighbors
 		std::partial_sort_copy(std::begin(count), std::end(count), std::begin(resultsID), std::end(resultsID),
 			[](const std::pair<unsigned, unsigned>& left, const std::pair<unsigned, unsigned>& right) {return left.second>right.second; });
-		
+
 		return resultsID;
 	}
 

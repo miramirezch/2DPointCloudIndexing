@@ -1,6 +1,6 @@
 #include "Cloud.h"
-#include "IGI.h"
 #include "Rtree.h"
+#include "IGI.h"
 #include "VPT.h"
 #include "IGIRtree.h"
 #include "IGIVpt.h"
@@ -55,13 +55,13 @@ int main()
 	// 1, 2342.7345, 7546.231
 
 	std::cout << "Loading PointClouds from CSV File" << '\n';
-	
+
 	// FileName - Fullpath to CSV File
 	std::string indexingFileName = "nubes_1k.csv";
-	std::string queriesFileName = "nubes_noise1k.csv";	
-	
+	std::string queriesFileName = "nubes_noise1k.csv";
+
 	// Loading PointClouds from CSV Fiels
-	auto cloudsQuery = ReadCSV<Point>(queriesFileName, 0, 10000, true);	
+	auto cloudsQuery = ReadCSV<Point>(queriesFileName, 0, 10000, true);
 	auto cloudsIndexing = ReadCSV<Point>(indexingFileName, 0, 10000, true);
 
 	std::cout << "--------------------------------------------------" << '\n';
@@ -70,7 +70,7 @@ int main()
 	// Performance Comparation
 	// Data: Indexing 1K PointClouds with ~1000 Point/PointCloud
 	// Query: Same PointClouds from Indexing with ~10% of Noise (Insertions/Deletions)
-	
+
 	std::cout << "Performance Comparation Section" << '\n';
 
 	std::cout << "Building Indexes" << '\n';
@@ -81,54 +81,54 @@ int main()
 	rtree2.Build(cloudsIndexing);
 
 	// Inverted Grid Index
-	IGI<Point> igi2(cloudsIndexing, "IGI",10000, 10);
+	IGI<Point> igi2(cloudsIndexing, "IGI", 10000, 10);
 
 	// ShazamHash
 	ShazamHashParameters param2(1, 0, 500, 500, 10);
-	ShazamHash<Point> shazam2(cloudsIndexing, "Shazam",param2);
+	ShazamHash<Point> shazam2(cloudsIndexing, "Shazam", param2);
 
 	// VPT
 	VPT<Point> vpt2("VPT");
 	vpt2.Build(cloudsIndexing, DistL2);
-		
+
 	// IGIRtree
 	IGIRtree<Point> igiRtree2(cloudsIndexing, "IGIRtree", 10000, 10);
 
 	// IGIVpt
-	IGIVpt<Point> igiVPT2(cloudsIndexing,DistL2 ,"IGIVpt", 10000, 10);
+	IGIVpt<Point> igiVPT2(cloudsIndexing, DistL2, "IGIVpt", 10000, 10);
 
 	// SuccinctIGI
-	SuccinctIGI<Point> sIGI2(cloudsIndexing, "SuccinctIGI",10000,10);
+	SuccinctIGI<Point> sIGI2(cloudsIndexing, "SuccinctIGI", 10000, 10);
 
 	// SarrayVPT
-	SarrayVPT<Point, HammingDistance> sarrayVPT2("SarrayVPT",10000,10);
+	SarrayVPT<Point, HammingDistance> sarrayVPT2("SarrayVPT", 10000, 10);
 	sarrayVPT2.Build(cloudsIndexing);
 
 	// Define wanted recall: In this case, Recall@1, Recall@5, Recall@10 
-	std::vector<unsigned> recall{1,10,30};
+	std::vector<unsigned> recall{ 1,10,30 };
 	std::cout << "Starting Queries" << std::endl;
 
 	// Performance Test	
 	auto reportRtree = rtree2.KNNPerformanceReport<std::chrono::microseconds>(cloudsQuery, 1, 1, recall);
 	auto reportIGI = igi2.KNNPerformanceReport<std::chrono::microseconds>(cloudsQuery, 1, recall);
 	auto reportShazam = shazam2.KNNPerformanceReport<std::chrono::microseconds>(cloudsQuery, 1, recall, param2);
-	auto reportVPT = vpt2.KNNPerformanceReport<std::chrono::microseconds>(cloudsQuery, 1,1,recall);
+	auto reportVPT = vpt2.KNNPerformanceReport<std::chrono::microseconds>(cloudsQuery, 1, 1, recall);
 	auto reportIGIVpt = igiVPT2.KNNPerformanceReport<std::chrono::microseconds>(cloudsQuery, 1, 1, recall);
 	auto reportIGIRtree = igiRtree2.KNNPerformanceReport<std::chrono::microseconds>(cloudsQuery, 1, 1, recall);
-	auto reportSuccinctIGI = sIGI2.KNNPerformanceReport<std::chrono::microseconds>(cloudsQuery, 1, recall);      
-	auto reportSarrayVPT = sarrayVPT2.KNNPerformanceReport<std::chrono::microseconds>(cloudsQuery,1,1,recall);
-	
+	auto reportSuccinctIGI = sIGI2.KNNPerformanceReport<std::chrono::microseconds>(cloudsQuery, 1, recall);
+	auto reportSarrayVPT = sarrayVPT2.KNNPerformanceReport<std::chrono::microseconds>(cloudsQuery, 1, 1, recall);
+
 
 	// Print Performance Report
-	PrintPerformanceReport(reportRtree, rtree2.GetName() ,"us");
-	PrintPerformanceReport(reportIGI,igi2.GetName(),"us");
-	PrintPerformanceReport(reportShazam,shazam2.GetName(), "us");
+	PrintPerformanceReport(reportRtree, rtree2.GetName(), "us");
+	PrintPerformanceReport(reportIGI, igi2.GetName(), "us");
+	PrintPerformanceReport(reportShazam, shazam2.GetName(), "us");
 	PrintPerformanceReport(reportVPT, vpt2.GetName(), "us");
 	PrintPerformanceReport(reportIGIRtree, igiRtree2.GetName(), "us");
 	PrintPerformanceReport(reportIGIVpt, igiVPT2.GetName(), "us");
 	PrintPerformanceReport(reportSuccinctIGI, sIGI2.GetName(), "us");
 	PrintPerformanceReport(reportSarrayVPT, sarrayVPT2.GetName(), "us");
-	
+
 	getchar();
 
 	return 0;
