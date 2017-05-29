@@ -138,6 +138,7 @@
     <ClInclude Include="UtilityFunctions.h" />
     <ClInclude Include="vp-tree.h" />
     <ClInclude Include="VPT.h" />
+    <ClInclude Include="vptPointers.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="IGI Spark.ipynb" />

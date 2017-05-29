@@ -101,7 +101,7 @@ int main()
 	SuccinctIGI<Point> sIGI2(cloudsIndexing, "SuccinctIGI",10000,10);
 
 	// SarrayVPT
-	SarrayVPT<Point,HammingDistance> sarrayVPT2("SarrayVPT",10000,10);
+	SarrayVPT<Point, HammingDistance> sarrayVPT2("SarrayVPT",10000,10);
 	sarrayVPT2.Build(cloudsIndexing);
 
 	// Define wanted recall: In this case, Recall@1, Recall@5, Recall@10 

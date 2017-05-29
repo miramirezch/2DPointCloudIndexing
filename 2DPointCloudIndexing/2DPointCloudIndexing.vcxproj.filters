@@ -90,6 +90,9 @@
     <ClInclude Include="Rtree.h">
       <Filter>Rtree</Filter>
     </ClInclude>
+    <ClInclude Include="vptPointers.h">
+      <Filter>SarrayVPT</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Example.cpp">

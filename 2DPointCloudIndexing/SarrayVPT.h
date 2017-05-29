@@ -7,6 +7,7 @@
 #include "vp-tree.h"
 #include "PerformanceReport.h"
 #include "Cloud.h"
+#include "vptPointers.h"
 #include <boost/geometry.hpp>
 #include <set>
 #include <sdsl/bit_vectors.hpp>
@@ -17,13 +18,13 @@
 // Index for Point Clouds using Sarray and VPT
 // T: Point class(2D)
 
-template<typename T>
+template<typename T, double(*distance)(const T&, const T&)>
 class SarrayVPT
 {
 	using PointIdx = std::pair<sdsl::sd_vector<>, unsigned>;
 
 private:	
-	VpTree<PointIdx> vpt;	
+	VptPointers<PointIdx, distance> vpt;
 	std::unordered_map<unsigned, unsigned> sizeClouds;	
 	std::string name_;
 	const unsigned cmax_;
@@ -54,7 +55,7 @@ public:
 		}
 
 		// Generate Index
-		vpt.Build(data, dist);
+		vpt.create(data);
 	}
 
 	sdsl::sd_vector<> GenerateSarray(const Cloud<T>& pointCloud) const
@@ -99,7 +100,7 @@ public:
 		std::vector<PointIdx> results;
 		std::vector<double> distances;
 
-		vpt.KNN(std::make_pair(GenerateSarray(queryCloud),0), internalK, results, distances);
+		vpt.search(std::make_pair(GenerateSarray(queryCloud),0), internalK, results, distances);
 
 		std::vector<std::pair<unsigned, double>> neighbors; 
 		neighbors.reserve(k);		
