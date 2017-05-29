@@ -1,5 +1,4 @@
 #include "Cloud.h"
-#include "RTree.h"
 #include "IGI.h"
 #include "VPT.h"
 #include "IGIRtree.h"
@@ -14,7 +13,6 @@
 #include <boost/functional/hash.hpp>
 #include <boost/geometry/index/rtree.hpp>
 #include <boost/geometry/index/parameters.hpp>
-#include "PermutationHash.h"
 
 // Miguel Ramirez Chacon
 // Example for 2D Point Cloud Indexing
@@ -105,9 +103,6 @@ int main()
 	SarrayVPT<Point,HammingDistance> sarrayVPT2("SarrayVPT",10000,10);
 	sarrayVPT2.Build(cloudsIndexing);
 
-	// PermutationHash
-	PermutationHash<Point> permutationHash2(cloudsIndexing, "PermutationHash", 10000, 10, 8);
-
 	// Define wanted recall: In this case, Recall@1, Recall@5, Recall@10 
 	std::vector<unsigned> recall{1,10,30};
 	std::cout << "Starting Queries" << std::endl;
@@ -122,10 +117,9 @@ int main()
 	auto reportIGIVpt = igiVPT2.KNNPerformanceReport<std::chrono::microseconds>(cloudsQuery, 1,1 ,recall);
 	auto reportSuccinctIGI = sIGI2.KNNPerformanceReport<std::chrono::microseconds>(cloudsQuery, 1, recall);      
 	auto reportSarrayVPT = sarrayVPT2.KNNPerformanceReport<std::chrono::microseconds>(cloudsQuery,1,1,recall);
-	auto reportPermutation = permutationHash2.KNNPerformanceReport<std::chrono::microseconds>(cloudsQuery, 1, 1, recall);
+	
 
-
-	/ Print Performance Report
+	// Print Performance Report
 	PrintPerformanceReport(reportRtree, rtree2.GetName() ,"us");
 	PrintPerformanceReport(reportIGI,igi2.GetName(),"us");
 	PrintPerformanceReport(reportShazam,shazam2.GetName(), "us");
@@ -134,7 +128,7 @@ int main()
 	PrintPerformanceReport(reportIGIVpt, igiVPT2.GetName(), "us");
 	PrintPerformanceReport(reportSuccinctIGI, sIGI2.GetName(), "us");
 	PrintPerformanceReport(reportSarrayVPT, sarrayVPT2.GetName(), "us");
-	PrintPerformanceReport(reportPermutation, permutationHash2.GetName(), "us");
+	
 	getchar();
 
 	return 0;

@@ -13,9 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Rtree">
-      <UniqueIdentifier>{9ec07964-2a60-46ab-b1ad-ddf17d3ed9fc}</UniqueIdentifier>
-    </Filter>
     <Filter Include="General">
       <UniqueIdentifier>{96047c26-ac2d-429f-a54f-264ed55db733}</UniqueIdentifier>
     </Filter>
@@ -40,9 +37,6 @@
     <Filter Include="SarrayVPT">
       <UniqueIdentifier>{376b42ad-82af-424a-b91f-bd5fbb95c7f9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="PermutationHash">
-      <UniqueIdentifier>{d1444e1e-587d-4584-9c7c-378d3fe980a5}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Cloud.h">
@@ -59,9 +53,6 @@
     </ClInclude>
     <ClInclude Include="IGI.h">
       <Filter>IGI</Filter>
-    </ClInclude>
-    <ClInclude Include="RTree.h">
-      <Filter>Rtree</Filter>
     </ClInclude>
     <ClInclude Include="ShazamHash.h">
       <Filter>ShazamHash</Filter>
@@ -92,9 +83,6 @@
     </ClInclude>
     <ClInclude Include="SarrayVPT.h">
       <Filter>SarrayVPT</Filter>
-    </ClInclude>
-    <ClInclude Include="PermutationHash.h">
-      <Filter>PermutationHash</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
