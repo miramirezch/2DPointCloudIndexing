@@ -37,6 +37,9 @@
     <Filter Include="SarrayVPT">
       <UniqueIdentifier>{376b42ad-82af-424a-b91f-bd5fbb95c7f9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Rtree">
+      <UniqueIdentifier>{ba9732c9-04a3-4d95-acf8-7d1a4c5e3920}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Cloud.h">
@@ -83,6 +86,9 @@
     </ClInclude>
     <ClInclude Include="SarrayVPT.h">
       <Filter>SarrayVPT</Filter>
+    </ClInclude>
+    <ClInclude Include="Rtree.h">
+      <Filter>Rtree</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

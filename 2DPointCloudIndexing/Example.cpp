@@ -1,5 +1,6 @@
 #include "Cloud.h"
 #include "IGI.h"
+#include "Rtree.h"
 #include "VPT.h"
 #include "IGIRtree.h"
 #include "IGIVpt.h"
@@ -110,11 +111,10 @@ int main()
 	// Performance Test	
 	auto reportRtree = rtree2.KNNPerformanceReport<std::chrono::microseconds>(cloudsQuery, 1, 1, recall);
 	auto reportIGI = igi2.KNNPerformanceReport<std::chrono::microseconds>(cloudsQuery, 1, recall);
-	auto reportShazam = shazam2.KNNPerformanceReport<std::chrono::microseconds>(cloudsQuery, 1, recall, param2);*/
+	auto reportShazam = shazam2.KNNPerformanceReport<std::chrono::microseconds>(cloudsQuery, 1, recall, param2);
 	auto reportVPT = vpt2.KNNPerformanceReport<std::chrono::microseconds>(cloudsQuery, 1,1,recall);
 	auto reportIGIVpt = igiVPT2.KNNPerformanceReport<std::chrono::microseconds>(cloudsQuery, 1, 1, recall);
 	auto reportIGIRtree = igiRtree2.KNNPerformanceReport<std::chrono::microseconds>(cloudsQuery, 1, 1, recall);
-	auto reportIGIVpt = igiVPT2.KNNPerformanceReport<std::chrono::microseconds>(cloudsQuery, 1,1 ,recall);
 	auto reportSuccinctIGI = sIGI2.KNNPerformanceReport<std::chrono::microseconds>(cloudsQuery, 1, recall);      
 	auto reportSarrayVPT = sarrayVPT2.KNNPerformanceReport<std::chrono::microseconds>(cloudsQuery,1,1,recall);
 	
