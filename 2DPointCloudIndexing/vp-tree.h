@@ -49,7 +49,7 @@ public:
 	{
 		distance = dist;
 		auto power = static_cast<unsigned>(std::floor(std::log2(data.size()) + 1));
-		auto size{ 1 << power };
+		auto size =  1 << power ;
 
 		std::vector<Node<T>> temp(size - 1);
 		tree_ = std::move(temp);

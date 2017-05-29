@@ -18,7 +18,7 @@
 // Index for Point Clouds using Sarray and VPT
 // T: Point class(2D)
 
-template<typename T, double(*distance)(const T&, const T&)>
+template<typename T, double(*distance)(const std::pair<sdsl::sd_vector<>, unsigned>&, const std::pair<sdsl::sd_vector<>, unsigned>&)>
 class SarrayVPT
 {
 	using PointIdx = std::pair<sdsl::sd_vector<>, unsigned>;
