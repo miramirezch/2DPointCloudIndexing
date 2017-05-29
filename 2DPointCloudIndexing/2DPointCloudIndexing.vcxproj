@@ -129,6 +129,7 @@
     <ClInclude Include="IGIRtree.h" />
     <ClInclude Include="IGIVpt.h" />
     <ClInclude Include="PerformanceReport.h" />
+    <ClInclude Include="PermutationHash.h" />
     <ClInclude Include="RTree.h" />
     <ClInclude Include="SarrayMetrics.h" />
     <ClInclude Include="SarrayVPT.h" />

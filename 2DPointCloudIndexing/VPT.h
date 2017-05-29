@@ -9,7 +9,6 @@
 #include "Cloud.h"
 #include <boost/geometry.hpp>
 
-
 // Miguel Ramirez Chacon
 // 21/05/17
 
@@ -17,13 +16,13 @@
 // T: Point class(2D)
 // D: Distance Function (Metric)
 
-template<typename T, double(*distance)(const std::pair<T, unsigned>&, const std::pair<T, unsigned>&)>
+template<typename T>
 class VPT
 {
 	using PointIdx = std::pair<T, unsigned>;	
 
 private:	
-	VpTree<PointIdx,distance> vpt;
+	VpTree<PointIdx> vpt;
 	std::unordered_map<unsigned, unsigned> sizeClouds;
 	std::string name_;
 
@@ -32,7 +31,7 @@ public:
 	VPT(std::string name) :name_{ name } {}
 
 	// Build index from vector of Point Clouds
-	void Build(const std::vector<Cloud<T>>& pointClouds)
+	void Build(const std::vector<Cloud<T>>& pointClouds, std::function<double(const std::pair<T, unsigned>&, const std::pair<T, unsigned>&)> dist)
 	{
 		std::vector<PointIdx> data;
 		int totalPoints = 0;
@@ -57,7 +56,7 @@ public:
 		}
 
 		// Generate Index
-		vpt.create(data);
+		vpt.Build(data, dist);
 	}
 
 	std::string GetName(){return name_;}
@@ -71,21 +70,20 @@ public:
 		std::vector<PointIdx> results;
 		std::vector<double> distances;
 		std::unordered_map<unsigned, unsigned> count;
-
+		auto i = 0;
 		// K queries for every point in the PointCloud
 		for (const auto& point : queryCloud.Points)
 		{
-			vpt.search(std::make_pair(point,1), internalK, &results, &distances);
-
+			vpt.KNN(std::make_pair(point,1), internalK, results, distances);
+			
 			// Count the frequencies for the Clouds ID
 			for (const auto& item : results)
 			{
 				count[item.second]++;
 			}
-
 			results.clear();
 			distances.clear();
-		}	
+		}			
 
 		auto numberResults = 0;
 
@@ -122,9 +120,9 @@ public:
 		{
 			// Perform KNN search
 			start = std::chrono::high_resolution_clock::now();
-			auto result = KNN(cloud, k, internalK);
+			auto result = KNN(cloud, k, internalK);			
 			end = std::chrono::high_resolution_clock::now();
-
+			
 			GetRecall(performance, result, recallAt, cloud.ID);
 
 			performance.QueriesTime.push_back(std::chrono::duration_cast<Duration>(end - start).count());
@@ -134,11 +132,8 @@ public:
 		{
 			pair.second = pair.second / static_cast<double>(queryClouds.size());
 		}
-
 		TimePerformance(performance);
-
 		return performance;
 	}
 
 };
-

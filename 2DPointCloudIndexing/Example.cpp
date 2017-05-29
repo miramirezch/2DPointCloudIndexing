@@ -14,6 +14,7 @@
 #include <boost/functional/hash.hpp>
 #include <boost/geometry/index/rtree.hpp>
 #include <boost/geometry/index/parameters.hpp>
+#include "PermutationHash.h"
 
 // Miguel Ramirez Chacon
 // Example for 2D Point Cloud Indexing
@@ -27,105 +28,16 @@ using Point = bg::model::point<float, 2, boost::geometry::cs::cartesian>;
 using PointIdx = std::pair<Point, unsigned>;
 
 // Metric function for Vantage Point Tree Index
-double DistL2(const PointIdx& p1, const PointIdx& p2)
+auto DistL2 = [](const PointIdx& p1, const PointIdx& p2)
 {
 	auto dx = std::pow(boost::geometry::get<0>(p1.first) - boost::geometry::get<0>(p2.first), 2);
 	auto dy = std::pow(boost::geometry::get<1>(p1.first) - boost::geometry::get<1>(p2.first), 2);
 
-	return std::sqrt(dx + dy);
-}
+	return static_cast<double>(std::sqrt(dx + dy));
+};
 
 int main()
 {
-	//---------------------------------------------------------------------------
-	// Getting Started
-	// Examples for Generating a PointCloud and creating a Index on this data	
-
-	// PointCloud (ID = 100)
-	Cloud<Point> cloud(100);
-
-	// Add some points to the PointCloud 
-	cloud.Add(Point(1, 1)).Add(Point(2, 2)).Add(Point(3, 3)).Add(Point(4, 4));
-	
-	// Vector of PointClouds
-	std::vector<Cloud<Point>> clouds{ cloud };
-
-	// Rtree for PointClouds -Declaration and construction
-	// 1st Parameter - Vector of PointClouds
-	Rtree<Point> rtree("Rtree");	
-	rtree.Build(clouds);
-	
-	// Inverted Grid Index for PointClouds -Declaration and construction
-	// 1st Parameter - Vector of PointClouds
-	// 2nd Parameter - cmax: Upper bound of valid coordinate for the two axis
-	// 3rd Parameter - delta: Dimension of uniform cell
-	IGI<Point> igi(clouds,"IGI",10000,10);
-
-	// ShazamHash for PointClouds -Declaration and construction
-	// Parameter for ShazamHash
-	// 1st Parameter - delta: Dimension of uniform cell
-	// 2nd Parameter - DelayX: Delay for Target Zone in X axis
-	// 3rd Parameter - DeltaX: Dimension for Target Zone in X axis
-	// 4th Parameter - DeltaY: Dimension for Target Zone in Y Axis
-	// 5th Parameter - CombinationLimit: Maximum number of tuples for an anchor point and a Target Zone
-	ShazamHashParameters param(1, 0, 100, 100, 1);
-	ShazamHash<Point> shazam(clouds,"Shazam",param);	
-
-	// Vantage Point Tree for PointClouds -Declaration and construction	
-	VPT<Point, DistL2> vpt("VPT");
-	// 1st Parameter - Vector of PointClouds
-	vpt.Build(clouds);
-
-	// IGIRtree for PointClouds -Declaration and construction	
-	// 1st Parameter - Vector of PointClouds
-	// 2nd Parameter  - Name of Index
-	// 3rd Parameter - cmax: Upper bound of valid coordinate for the two axis
-	// 4th Parameter - delta: Dimension of uniform cell
-	IGIRtree<Point> igiRtree(clouds, "IGIRtree", 10000, 10);
-
-	// IGIVpt for PointClouds -Declaration and construction	
-	// 1st Parameter - Vector of PointClouds
-	// 2nd Parameter  - Name of Index
-	// 3rd Parameter - cmax: Upper bound of valid coordinate for the two axis
-	// 4th Parameter - delta: Dimension of uniform cell
-	IGIVpt<Point, DistL2> igiVPT(clouds, "IGIVpt", 10000, 10);
-
-	SuccinctIGI<Point> sIGI(clouds, "SuccinctIGI",10000,10);
-
-	SarrayVPT<Point,HammingDistance> sarrayVPT("SarrayVPT",10000,10);
-	sarrayVPT.Build(clouds);
-
-	//---------------------------------------------------------------------------
-	// Query Example
-
-	// Rtree - KNN Query
-	// 1st Parameter: Query =  PointCloud
-	// 2nd Parameter: K = K Nearest Neighbors PointClouds
-	// 3rd Parameter: internalK = internalK-NN queries per point in PointCloud
-	auto resultKNN = rtree.KNN(cloud,1,1);
-
-	std::cout << "Query Example - Rtree Section" << '\n';
-
-	// Print Results for KNN Query
-	for (auto r : resultKNN)
-	{
-		std::cout << "Cloud: " << r.first << " - Matches: " << r.second << '\n';
-	}
-
-	// Intersection Query
-	// 1st Parameter: Query = PointCloud
-	// 2nd Parameter: Dimension for Intersection Window (Box centered in  point)
-	// 3rd Parameter: Epsilon = Retrieve all PointClouds with support > epsilon
-	auto resultIntersection = rtree.Intersection(cloud, 1, 0.5);
-
-	// Print Results
-	for (auto r : resultIntersection)
-	{
-		std::cout << "Cloud: " << r.first << " - Support: " << r.second << '\n';
-	}
-
-	std::cout << "--------------------------------------------------" << '\n';
-
 	//---------------------------------------------------------------------------
 	// Obtain PointClouds from CSV File
 	// Test for ReadCSV Function - Get PointClouds from File
@@ -146,8 +58,8 @@ int main()
 	std::cout << "Loading PointClouds from CSV File" << '\n';
 	
 	// FileName - Fullpath to CSV File
-	std::string queriesFileName = "nubes_noise1k.csv";
-	std::string indexingFileName = "nubes_10k.csv";
+	std::string indexingFileName = "nubes_1k.csv";
+	std::string queriesFileName = "nubes_noise1k.csv";	
 	
 	// Loading PointClouds from CSV Fiels
 	auto cloudsQuery = ReadCSV<Point>(queriesFileName, 0, 10000, true);	
@@ -177,14 +89,14 @@ int main()
 	ShazamHash<Point> shazam2(cloudsIndexing, "Shazam",param2);
 
 	// VPT
-	VPT<Point, DistL2> vpt2("Vantage Point Tree");
-	vpt2.Build(cloudsIndexing);
-
+	VPT<Point> vpt2("VPT");
+	vpt2.Build(cloudsIndexing, DistL2);
+		
 	// IGIRtree
 	IGIRtree<Point> igiRtree2(cloudsIndexing, "IGIRtree", 10000, 10);
 
 	// IGIVpt
-	IGIVpt<Point, DistL2> igiVPT2(cloudsIndexing, "IGIVpt", 10000, 10);
+	IGIVpt<Point> igiVPT2(cloudsIndexing,DistL2 ,"IGIVpt", 10000, 10);
 
 	// SuccinctIGI
 	SuccinctIGI<Point> sIGI2(cloudsIndexing, "SuccinctIGI",10000,10);
@@ -193,22 +105,27 @@ int main()
 	SarrayVPT<Point,HammingDistance> sarrayVPT2("SarrayVPT",10000,10);
 	sarrayVPT2.Build(cloudsIndexing);
 
+	// PermutationHash
+	PermutationHash<Point> permutationHash2(cloudsIndexing, "PermutationHash", 10000, 10, 8);
+
 	// Define wanted recall: In this case, Recall@1, Recall@5, Recall@10 
-	std::vector<unsigned> recall{1,5,10};
+	std::vector<unsigned> recall{1,10,30};
+	std::cout << "Starting Queries" << std::endl;
 
 	// Performance Test	
-	std::cout << "Starting Queries" << std::endl;
 	auto reportRtree = rtree2.KNNPerformanceReport<std::chrono::microseconds>(cloudsQuery, 1, 1, recall);
 	auto reportIGI = igi2.KNNPerformanceReport<std::chrono::microseconds>(cloudsQuery, 1, recall);
-	auto reportShazam = shazam2.KNNPerformanceReport<std::chrono::microseconds>(cloudsQuery, 1, recall, param2);
+	auto reportShazam = shazam2.KNNPerformanceReport<std::chrono::microseconds>(cloudsQuery, 1, recall, param2);*/
 	auto reportVPT = vpt2.KNNPerformanceReport<std::chrono::microseconds>(cloudsQuery, 1,1,recall);
+	auto reportIGIVpt = igiVPT2.KNNPerformanceReport<std::chrono::microseconds>(cloudsQuery, 1, 1, recall);
 	auto reportIGIRtree = igiRtree2.KNNPerformanceReport<std::chrono::microseconds>(cloudsQuery, 1, 1, recall);
 	auto reportIGIVpt = igiVPT2.KNNPerformanceReport<std::chrono::microseconds>(cloudsQuery, 1,1 ,recall);
 	auto reportSuccinctIGI = sIGI2.KNNPerformanceReport<std::chrono::microseconds>(cloudsQuery, 1, recall);      
 	auto reportSarrayVPT = sarrayVPT2.KNNPerformanceReport<std::chrono::microseconds>(cloudsQuery,1,1,recall);
+	auto reportPermutation = permutationHash2.KNNPerformanceReport<std::chrono::microseconds>(cloudsQuery, 1, 1, recall);
 
 
-	// Print Performance Report
+	/ Print Performance Report
 	PrintPerformanceReport(reportRtree, rtree2.GetName() ,"us");
 	PrintPerformanceReport(reportIGI,igi2.GetName(),"us");
 	PrintPerformanceReport(reportShazam,shazam2.GetName(), "us");
@@ -217,8 +134,10 @@ int main()
 	PrintPerformanceReport(reportIGIVpt, igiVPT2.GetName(), "us");
 	PrintPerformanceReport(reportSuccinctIGI, sIGI2.GetName(), "us");
 	PrintPerformanceReport(reportSarrayVPT, sarrayVPT2.GetName(), "us");
-
+	PrintPerformanceReport(reportPermutation, permutationHash2.GetName(), "us");
 	getchar();
 
 	return 0;
 }
+
+

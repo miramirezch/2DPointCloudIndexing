@@ -40,6 +40,9 @@
     <Filter Include="SarrayVPT">
       <UniqueIdentifier>{376b42ad-82af-424a-b91f-bd5fbb95c7f9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="PermutationHash">
+      <UniqueIdentifier>{d1444e1e-587d-4584-9c7c-378d3fe980a5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Cloud.h">
@@ -89,6 +92,9 @@
     </ClInclude>
     <ClInclude Include="SarrayVPT.h">
       <Filter>SarrayVPT</Filter>
+    </ClInclude>
+    <ClInclude Include="PermutationHash.h">
+      <Filter>PermutationHash</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

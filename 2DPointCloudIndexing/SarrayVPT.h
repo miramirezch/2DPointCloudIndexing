@@ -11,13 +11,19 @@
 #include <set>
 #include <sdsl/bit_vectors.hpp>
 
-template<typename T, double(*distance)(const std::pair<sdsl::sd_vector<>, unsigned>&, const std::pair<sdsl::sd_vector<>, unsigned>&)>
+// Miguel Ramirez Chacon
+// 28/05/17
+
+// Index for Point Clouds using Sarray and VPT
+// T: Point class(2D)
+
+template<typename T>
 class SarrayVPT
 {
 	using PointIdx = std::pair<sdsl::sd_vector<>, unsigned>;
 
 private:	
-	VpTree<PointIdx,distance> vpt;	
+	VpTree<PointIdx> vpt;	
 	std::unordered_map<unsigned, unsigned> sizeClouds;	
 	std::string name_;
 	const unsigned cmax_;
@@ -27,7 +33,7 @@ public:
 
 	SarrayVPT(std::string name, unsigned cmax, unsigned delta) :name_{ name },cmax_{ cmax }, delta_{ delta } {}
 
-	void Build(const std::vector<Cloud<T>>& pointClouds)
+	void Build(const std::vector<Cloud<T>>& pointClouds, std::function<double(const std::pair<T, unsigned>&, const std::pair<T, unsigned>&)> dist)
 	{
 		int totalPoints {0};
 		std::vector<PointIdx> data;
@@ -48,7 +54,7 @@ public:
 		}
 
 		// Generate Index
-		vpt.create(data);
+		vpt.Build(data, dist);
 	}
 
 	sdsl::sd_vector<> GenerateSarray(const Cloud<T>& pointCloud) const
@@ -93,7 +99,7 @@ public:
 		std::vector<PointIdx> results;
 		std::vector<double> distances;
 
-		vpt.search(std::make_pair(GenerateSarray(queryCloud),0), internalK, &results, &distances);
+		vpt.KNN(std::make_pair(GenerateSarray(queryCloud),0), internalK, results, distances);
 
 		std::vector<std::pair<unsigned, double>> neighbors; 
 		neighbors.reserve(k);		

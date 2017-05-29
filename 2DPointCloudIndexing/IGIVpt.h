@@ -15,13 +15,13 @@
 // T: Point class(2D)
 // D: Distance Function (Metric)
 
-template<typename T, double(*distance)(const std::pair<T, unsigned>&, const std::pair<T, unsigned>&)>
+template<typename T>
 class IGIVpt
 {
 	using PointIdx = std::pair<T, unsigned>;
 
 private:	
-	std::unordered_map<unsigned, VpTree<PointIdx, distance>> igiVPT;
+	std::unordered_map<unsigned, VpTree<PointIdx>> igiVPT;
 	std::unordered_map<unsigned, unsigned> sizeClouds;
 	std::string name_;
 	const unsigned cmax_;
@@ -29,15 +29,15 @@ private:
 
 public:
 
-	IGIVpt(const std::vector<Cloud<T>>& pointClouds, std::string name, const unsigned cmax, const unsigned delta) :name_{ name }, cmax_{ cmax }, delta_{ delta }
+	IGIVpt(std::vector<Cloud<T>>& pointClouds, std::function<double(const PointIdx&, const PointIdx&)> dist,std::string name, const unsigned cmax, const unsigned delta) :name_{ name }, cmax_{ cmax }, delta_{ delta }
 	{
 		std::unordered_map<unsigned, std::vector<PointIdx>> pointsWithinCell;
 		PointsWithinCell(pointClouds, pointsWithinCell);
 
-		for (const auto& pair : pointsWithinCell)
+		for (auto& pair : pointsWithinCell)
 		{
 			// Create a VPT for every cell						
-			igiVPT[pair.first].create(pair.second);
+			igiVPT[pair.first].Build(pair.second, dist);
 		}
 	}
 
@@ -47,7 +47,7 @@ public:
 	}
 
 	// Calculate cell for every point in pointClouds
-	void PointsWithinCell(const std::vector<Cloud<T>>& pointClouds, std::unordered_map<unsigned, std::vector<PointIdx>>& pointsWithinCell)
+	void PointsWithinCell(std::vector<Cloud<T>>& pointClouds, std::unordered_map<unsigned, std::vector<PointIdx>>& pointsWithinCell)
 	{
 		int totalPoints = 0;
 		unsigned px, py, cell;
@@ -94,7 +94,7 @@ public:
 			// Get List from Inverted Index and count frequency of ID's
 			if (it != std::end(igiVPT))
 			{				
-				(it->second).search(std::make_pair(point, 0), internalK, &results, &distances);
+				(it->second).KNN(std::make_pair(point, 0), internalK, results, distances);
 
 				// Count the frequencies for the Clouds ID
 				for (const auto& item : results)
@@ -159,8 +159,4 @@ public:
 
 		return performance;
 	}
-
-
-
-
 };

@@ -28,10 +28,11 @@ private:
 
 	boost::geometry::index::rtree<PointIdx, Param> rtree;
 	std::unordered_map<unsigned, unsigned> sizeClouds;
-	std::string name_;
+	std::string name_ = "Rtree";
 
 
 public:
+	Rtree() {}
 
 	Rtree(std::string name) :name_{ name } {}
 

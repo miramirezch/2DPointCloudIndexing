@@ -1,189 +1,194 @@
 #pragma once
-#ifndef VPTREE_H
-#define VPTREE_H
-
-#include <stdlib.h>
-#include <algorithm>
 #include <vector>
-#include <stdio.h>
+#include <functional>
+#include <cmath>
+#include <random>
+#include <algorithm>
 #include <queue>
-#include <limits>
 
-// Vantage Point Tree Implementation
-// Gregor Burger
-// https://github.com/gregorburger/vp-tree
-// Based on http://stevehanov.ca/blog/index.php?id=130
+// Miguel Ramirez Chacon
+// 28/05/17
 
+// Array based Vantage Point Tree
+// Based on https://github.com/gregorburger/vp-tree (Pointer based)
+// T: Point class(2D)
 
-template<typename T, double(*distance)(const T&, const T&)>
+template<typename T>
+struct Node
+{
+	T Data;
+	double Threshold;
+};
+
+template<typename T>
+struct HeapItem
+{
+	HeapItem(T data, double distance) :Data{ data }, Distance{ distance } {}
+	T Data;
+	double Distance;
+
+	bool operator<(const HeapItem& o) const
+	{
+		return Distance < o.Distance;
+	}
+};
+
+template<typename T>
 class VpTree
 {
-public:
-	VpTree() : _root(0) {}
-
-	~VpTree()
-	{
-		delete _root;
-	}
-
-	void create(const std::vector<T>& items)
-	{
-		delete _root;
-		_items = items;
-		_root = buildFromPoints(0, items.size());
-	}
-
-	void search(const T& target, int k, std::vector<T>* results,
-		std::vector<double>* distances) const
-	{
-		std::priority_queue<HeapItem> heap;
-
-		double _tau = std::numeric_limits<double>::max();
-		search(_root, target, k, heap, _tau);
-
-		results->clear(); distances->clear();
-
-		while (!heap.empty())
-		{
-			results->push_back(_items[heap.top().index]);
-			distances->push_back(heap.top().dist);
-			heap.pop();
-		}
-
-		std::reverse(results->begin(), results->end());
-		std::reverse(distances->begin(), distances->end());
-	}
-
 private:
-	std::vector<T> _items;
+	std::vector<Node<T>> tree_;
+	std::vector<bool> flags_;
+	std::function<double(const T&, const T&)> distance;
 
-	struct Node
+public:
+
+	VpTree() {}
+
+	void Build(std::vector<T>& data, std::function<double(const T&, const T&)> dist)
 	{
-		int index;
-		double threshold;
-		Node* left;
-		Node* right;
+		distance = dist;
+		auto power = static_cast<unsigned>(std::floor(std::log2(data.size()) + 1));
+		auto size{ 1 << power };
 
-		Node() :
-			index(0), threshold(0.), left(0), right(0)
+		std::vector<Node<T>> temp(size - 1);
+		tree_ = std::move(temp);
+
+		flags_.reserve(size - 1);
+
+		for (auto i = 0; i < (size - 1); i++)
 		{
+			flags_.push_back(false);
 		}
 
-		~Node()
-		{
-			delete left;
-			delete right;
-		}
-	}*_root;
+		auto lower = 0;
+		auto upper = data.size() - 1;
+		auto position = 1;
 
-	struct HeapItem
-	{
-		HeapItem(int index, double dist) :
-			index(index), dist(dist)
-		{
-		}
-		int index;
-		double dist;
-		bool operator<(const HeapItem& o) const
-		{
-			return dist < o.dist;
-		}
-	};
+		std::random_device rd;
+		std::mt19937 gen(0);
+		std::uniform_real_distribution<> dis(0, 1);
 
-	struct DistanceComparator
-	{
-		const T& item;
-		DistanceComparator(const T& item) : item(item) {}
-		bool operator()(const T& a, const T& b)
-		{
-			return distance(item, a) < distance(item, b);
-		}
-	};
-
-	Node* buildFromPoints(int lower, int upper)
-	{
-		if (upper == lower)
-		{
-			return NULL;
-		}
-
-		Node* node = new Node();
-		node->index = lower;
-
-		if (upper - lower > 1)
-		{
-
-			// choose an arbitrary point and move it to the start
-			int i = (int)((double)rand() / RAND_MAX * (upper - lower - 1)) + lower;
-			std::swap(_items[lower], _items[i]);
-
-			int median = (upper + lower) / 2;
-
-			// partitian around the median distance
-			std::nth_element(
-				_items.begin() + lower + 1,
-				_items.begin() + median,
-				_items.begin() + upper,
-				DistanceComparator(_items[lower]));
-
-			// what was the median?
-			node->threshold = distance(_items[lower], _items[median]);
-
-			node->index = lower;
-			node->left = buildFromPoints(lower + 1, median);
-			node->right = buildFromPoints(median, upper);
-		}
-
-		return node;
+		Build(data, position, dis, gen);
 	}
 
-	void search(Node* node, const T& target, size_t k,
-		std::priority_queue<HeapItem>& heap, double &_tau) const
+	void Build(std::vector<T>& data, int position, std::uniform_real_distribution<> dis, std::mt19937 gen)
 	{
-		if (node == NULL) return;
-
-		double dist = distance(_items[node->index], target);
-		//printf("dist=%g tau=%gn", dist, _tau );
-
-		if (dist < _tau)
+		if (data.size() == 1)
 		{
-			if (heap.size() == k) heap.pop();
-			heap.push(HeapItem(node->index, dist));
-			if (heap.size() == k) _tau = heap.top().dist;
-		}
+			Node<T> node;
+			node.Threshold = 0;
+			node.Data = data[0];
 
-		if (node->left == NULL && node->right == NULL)
-		{
+			tree_[position - 1] = node;
+			flags_[position - 1] = true;
 			return;
 		}
 
-		if (dist < node->threshold)
+		if (data.size() == 0)
+			return;
+
+		int i = static_cast<int>(dis(gen)*(data.size() - 1));
+		std::swap(data[data.size() - 1], data[i]);
+		auto pivot = data[data.size() - 1];
+		data.pop_back();
+
+		auto d = distance;
+
+		int median = data.size() / 2;
+
+		std::nth_element(
+			std::begin(data),
+			std::begin(data) + median,
+			std::end(data),
+			[pivot, d](const T& a, const T& b)
 		{
-			if (dist - _tau <= node->threshold)
+			return d(pivot, a) < d(pivot, b);
+		});
+
+		Node<T> node;
+
+		node.Threshold = distance(pivot, data[median]);
+		node.Data = pivot;
+
+		tree_[position - 1] = node;
+		flags_[position - 1] = true;
+
+		std::vector<T> leftSubTreeData(std::begin(data), std::begin(data) + median);
+		std::vector<T> rightSubTreeData(std::begin(data) + median, std::end(data));
+
+		Build(leftSubTreeData, 2 * position, dis, gen);
+		Build(rightSubTreeData, 2 * position + 1, dis, gen);
+	}
+
+	void KNN(const T& target, const unsigned k, std::vector<T>& results, std::vector<double>& distances) const
+	{
+		std::priority_queue<HeapItem<T>> heap;
+
+		double _tau = std::numeric_limits<double>::max();
+		Search(1, target, k, heap, _tau);
+
+		results.clear();
+		distances.clear();
+
+		while (!heap.empty())
+		{
+			results.push_back(heap.top().Data);
+			distances.push_back(heap.top().Distance);
+			heap.pop();
+		}
+
+		std::reverse(std::begin(results), std::end(results));
+		std::reverse(std::begin(distances), std::end(distances));
+	}
+
+	void Search(unsigned position, const T& target, size_t k,
+		std::priority_queue<HeapItem<T>>& heap, double& _tau) const
+	{
+		if (position > tree_.size() || flags_[position - 1] == false)
+		{
+			return;
+		}		
+
+		double dist = distance(tree_[position - 1].Data, target);
+		
+		if (dist < _tau)
+		{
+			if (heap.size() == k)
+				heap.pop();
+
+			heap.push(HeapItem<T>(tree_[position - 1].Data, dist));
+
+			if (heap.size() == k)
+				_tau = heap.top().Distance;
+		}			
+
+		double dm = tree_[position - 1].Threshold;
+
+		if (dist < dm)
+		{
+			if (dist - _tau <= dm)
 			{
-				search(node->left, target, k, heap, _tau);
+				Search(2 * position, target, k, heap, _tau);
 			}
 
-			if (dist + _tau >= node->threshold)
+			if (dist + _tau >= dm)
 			{
-				search(node->right, target, k, heap, _tau);
+				Search(2 * position + 1, target, k, heap, _tau);
 			}
 
 		}
 		else
 		{
-			if (dist + _tau >= node->threshold)
+			if (dist + _tau >= dm)
 			{
-				search(node->right, target, k, heap, _tau);
+				Search(2 * position + 1, target, k, heap, _tau);
 			}
 
-			if (dist - _tau <= node->threshold)
+			if (dist - _tau <= dm)
 			{
-				search(node->left, target, k, heap, _tau);
+				Search(2 * position, target, k, heap, _tau);
 			}
-		}
+		}		
 	}
 };
-
-#endif // VPTREE_H
-
