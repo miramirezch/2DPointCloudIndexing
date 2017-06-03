@@ -1,5 +1,6 @@
 #pragma once
 #include "vp-tree.h"
+#include "UtilityFunctions.h"
 #include "PerformanceReport.h"
 #include "Cloud.h"
 #include <boost/geometry.hpp>

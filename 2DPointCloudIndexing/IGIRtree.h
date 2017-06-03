@@ -1,6 +1,7 @@
 #pragma once
 #include "Cloud.h"
 #include "PerformanceReport.h"
+#include "UtilityFunctions.h"
 #include <boost/geometry.hpp>
 #include <boost/geometry/index/rtree.hpp>
 #include <boost/geometry/index/parameters.hpp>
