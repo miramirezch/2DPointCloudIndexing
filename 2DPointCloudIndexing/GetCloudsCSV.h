@@ -1,5 +1,6 @@
 #pragma once
 #include <fstream>
+#include <sstream>
 #include <vector>
 #include <unordered_map>
 #include "Cloud.h"
