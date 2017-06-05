@@ -5,6 +5,7 @@
 #include <random>
 #include <algorithm>
 #include <queue>
+#include "HeapItem.h"
 
 // Miguel Ramirez Chacon
 // 28/05/17
@@ -18,19 +19,6 @@ struct Node
 {
 	T Data;
 	double Threshold;
-};
-
-template<typename T>
-struct HeapItem
-{
-	HeapItem(T data, double distance) :Data{ data }, Distance{ distance } {}
-	T Data;
-	double Distance;
-
-	bool operator<(const HeapItem& o) const
-	{
-		return Distance < o.Distance;
-	}
 };
 
 template<typename T>

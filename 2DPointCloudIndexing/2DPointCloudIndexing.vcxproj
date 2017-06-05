@@ -122,9 +122,12 @@
     <ClCompile Include="Example.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="bk-tree.h" />
+    <ClInclude Include="BKT.h" />
     <ClInclude Include="Cloud.h" />
     <ClInclude Include="FingerPrint.h" />
     <ClInclude Include="GetCloudsCSV.h" />
+    <ClInclude Include="HeapItem.h" />
     <ClInclude Include="IGI.h" />
     <ClInclude Include="IGIRtree.h" />
     <ClInclude Include="IGIVpt.h" />

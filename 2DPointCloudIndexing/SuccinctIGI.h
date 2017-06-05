@@ -10,7 +10,7 @@
 #include <cmath>
 #include <string>
 #include <set>
-#include <sdsl/bit_vectors.hpp>
+//#include <sdsl/bit_vectors.hpp>
 
 // Miguel Ramirez Chacon
 // 23/05/17

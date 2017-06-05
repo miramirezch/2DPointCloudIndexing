@@ -40,6 +40,9 @@
     <Filter Include="Rtree">
       <UniqueIdentifier>{ba9732c9-04a3-4d95-acf8-7d1a4c5e3920}</UniqueIdentifier>
     </Filter>
+    <Filter Include="BKT">
+      <UniqueIdentifier>{80ae5a8f-d90e-4c67-824a-06db937f65ae}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Cloud.h">
@@ -92,6 +95,15 @@
     </ClInclude>
     <ClInclude Include="vptPointers.h">
       <Filter>SarrayVPT</Filter>
+    </ClInclude>
+    <ClInclude Include="bk-tree.h">
+      <Filter>BKT</Filter>
+    </ClInclude>
+    <ClInclude Include="HeapItem.h">
+      <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="BKT.h">
+      <Filter>BKT</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
