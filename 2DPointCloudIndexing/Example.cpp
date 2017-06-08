@@ -6,6 +6,7 @@
 #include "IGIVpt.h"
 #include "BKT.h"
 #include "ShazamHash.h"
+#include "RevLC.h"
 #include "SuccinctIGI.h"
 #include "GetCloudsCSV.h"
 #include "SarrayVPT.h"
@@ -86,30 +87,35 @@ int main()
 	std::cout << "Building Indexes" << '\n';
 	// Building Indexes on same data
 
-	// Rtree
+	//// Rtree
 	Rtree<Point> rtree2("Rtree");
 	rtree2.Build(cloudsIndexing);
 
-	// Inverted Grid Index
+	//// Inverted Grid Index
 	IGI<Point> igi2(cloudsIndexing, "IGI", 10000, 10);
 
-	// ShazamHash
+	//// ShazamHash
 	ShazamHashParameters param2(1, 0, 500, 500, 10);
 	ShazamHash<Point> shazam2(cloudsIndexing, "Shazam", param2);
 
-	// VPT
+	//// VPT
 	VPT<Point> vpt2("VPT");
 	vpt2.Build(cloudsIndexing, DistL2);
 
-	// BKT
+	//// BKT
 	VPT<Point> bkt2("BKT");
 	bkt2.Build(cloudsIndexing, DiscreteDistL2);
 
-	// IGIRtree
+	//// IGIRtree
 	IGIRtree<Point> igiRtree2(cloudsIndexing, "IGIRtree", 10000, 10);
 
-	// IGIVpt
+	//// IGIVpt
 	IGIVpt<Point> igiVPT2(cloudsIndexing, DistL2, "IGIVpt", 10000, 10);
+
+	// RevLC
+	RevLC<Point> lc("List of Clusters");
+	lc.Build(cloudsIndexing, DistL2, 10000);
+
 
 	// SuccinctIGI
 	SuccinctIGI<Point> sIGI2(cloudsIndexing, "SuccinctIGI", 10000, 10);
@@ -130,6 +136,9 @@ int main()
 	auto reportBKT = bkt2.KNNPerformanceReport<std::chrono::microseconds>(cloudsQuery, 1, 1, recall);
 	auto reportIGIVpt = igiVPT2.KNNPerformanceReport<std::chrono::microseconds>(cloudsQuery, 1, 1, recall);
 	auto reportIGIRtree = igiRtree2.KNNPerformanceReport<std::chrono::microseconds>(cloudsQuery, 1, 1, recall);
+	auto reportLC = lc.KNNPerformanceReport<std::chrono::microseconds>(cloudsQuery, 1, 1, recall);
+	auto reportVPT = vpt2.KNNPerformanceReport<std::chrono::microseconds>(cloudsQuery, 1, 1, recall);
+
 	auto reportSuccinctIGI = sIGI2.KNNPerformanceReport<std::chrono::microseconds>(cloudsQuery, 1, recall);
 	auto reportSarrayVPT = sarrayVPT2.KNNPerformanceReport<std::chrono::microseconds>(cloudsQuery, 1, 1, recall);
 
@@ -142,6 +151,8 @@ int main()
 	PrintPerformanceReport(reportBKT, bkt2.GetName(), "us");
 	PrintPerformanceReport(reportIGIRtree, igiRtree2.GetName(), "us");
 	PrintPerformanceReport(reportIGIVpt, igiVPT2.GetName(), "us");
+	PrintPerformanceReport(reportLC, lc.GetName(), "us");
+	PrintPerformanceReport(reportVPT, vpt2.GetName(), "us");
 	PrintPerformanceReport(reportSuccinctIGI, sIGI2.GetName(), "us");
 	PrintPerformanceReport(reportSarrayVPT, sarrayVPT2.GetName(), "us");
 

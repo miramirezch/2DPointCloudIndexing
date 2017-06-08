@@ -140,7 +140,7 @@ public:
 
 		double dist = distance(tree_[position - 1].Data, target);
 		
-		if (dist < _tau)
+		if (dist <= _tau)
 		{
 			if (heap.size() == k)
 				heap.pop();
@@ -155,7 +155,7 @@ public:
 
 		if (dist < dm)
 		{
-			if (dist - _tau <= dm)
+			if (dist <= dm + _tau)
 			{
 				Search(2 * position, target, k, heap, _tau);
 			}
@@ -173,7 +173,7 @@ public:
 				Search(2 * position + 1, target, k, heap, _tau);
 			}
 
-			if (dist - _tau <= dm)
+			if (dist <= dm + _tau)
 			{
 				Search(2 * position, target, k, heap, _tau);
 			}

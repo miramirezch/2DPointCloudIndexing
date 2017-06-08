@@ -56,12 +56,12 @@ public:
 
 		while (nodeStack.size() != 0)
 		{
-			auto currentPair = nodeStack.top();
+			auto currentNode = nodeStack.top();
 			nodeStack.pop();
 
-			auto d = distance(data.Data, currentPair->Data);
+			auto d = distance(data.Data, currentNode->Data);
 
-			for (auto& child : currentPair->children)
+			for (auto& child : currentNode->children)
 			{
 				if (d == child.first)
 				{
@@ -69,7 +69,7 @@ public:
 					continue;
 				}
 			}
-			currentPair->children.insert({ d, data });
+			currentNode->children.insert({ d, data });
 		}
 	}
 
@@ -78,7 +78,7 @@ public:
 		distance = dist;
 
 		auto data = Data;
-		while (data.size()>0)
+		while (data.size() > 0)
 		{
 			std::mt19937 gen(0);
 			std::uniform_int_distribution<> dis(0, data.size() - 1);

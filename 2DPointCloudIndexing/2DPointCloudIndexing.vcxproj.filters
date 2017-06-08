@@ -43,6 +43,9 @@
     <Filter Include="BKT">
       <UniqueIdentifier>{80ae5a8f-d90e-4c67-824a-06db937f65ae}</UniqueIdentifier>
     </Filter>
+    <Filter Include="LC">
+      <UniqueIdentifier>{aef836a5-cd81-4393-8ff9-6152abeed7ee}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Cloud.h">
@@ -104,6 +107,12 @@
     </ClInclude>
     <ClInclude Include="BKT.h">
       <Filter>BKT</Filter>
+    </ClInclude>
+    <ClInclude Include="rev-lc.h">
+      <Filter>LC</Filter>
+    </ClInclude>
+    <ClInclude Include="RevLC.h">
+      <Filter>LC</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

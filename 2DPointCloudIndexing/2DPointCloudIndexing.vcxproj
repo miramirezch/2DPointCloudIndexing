@@ -132,6 +132,8 @@
     <ClInclude Include="IGIRtree.h" />
     <ClInclude Include="IGIVpt.h" />
     <ClInclude Include="PerformanceReport.h" />
+    <ClInclude Include="rev-lc.h" />
+    <ClInclude Include="RevLC.h" />
     <ClInclude Include="Rtree.h" />
     <ClInclude Include="SarrayMetrics.h" />
     <ClInclude Include="SarrayVPT.h" />
