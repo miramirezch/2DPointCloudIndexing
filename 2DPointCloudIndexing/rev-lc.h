@@ -1,5 +1,6 @@
 #pragma once
 #include "vp-tree.h"
+#include "HeapItem.h"
 #include <vector>
 #include <random>
 #include <functional>
