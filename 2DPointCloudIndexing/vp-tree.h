@@ -182,32 +182,3 @@ public:
 	}
 };
 
-/*
-*
-*
-* if (dist < dm)
-{
-if (dist - _tau <= dm)
-{
-Search(2 * position, target, k, heap, _tau);
-}
-
-if (dist + _tau >= dm)
-{
-Search(2 * position + 1, target, k, heap, _tau);
-}
-
-}
-else
-{
-if (dist + _tau >= dm)
-{
-Search(2 * position + 1, target, k, heap, _tau);
-}
-
-if (dist - _tau <= dm)
-{
-Search(2 * position, target, k, heap, _tau);
-}
-}
-*/
