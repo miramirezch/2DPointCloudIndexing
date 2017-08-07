@@ -8,8 +8,8 @@
 // PointCloud Struct
 template<typename T>
 struct Cloud
-{	
-	Cloud(int id) :ID{ id } {}
+{
+	Cloud(unsigned id) :ID{ id } {}
 
 	// Fluent interface for inserting points
 	Cloud& Add(T point)
@@ -19,5 +19,5 @@ struct Cloud
 	}
 
 	std::vector<T> Points;
-	int ID;
+	unsigned ID;
 };

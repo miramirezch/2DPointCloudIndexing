@@ -6,10 +6,10 @@
 
 struct PerformanceReport
 {
-	std::unordered_map<int, double> RecallAt;
+	std::unordered_map<unsigned, double> RecallAt;
 	std::vector<int> QueriesTime;
 	double AverageQueryTime;
 	double SDQueryTime;
 	double MaxQueryTime;
-	double MinQueryTime;	
+	double MinQueryTime;
 };

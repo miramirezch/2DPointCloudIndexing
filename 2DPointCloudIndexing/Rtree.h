@@ -2,7 +2,6 @@
 #include "Cloud.h"
 #include "PerformanceReport.h"
 #include "UtilityFunctions.h"
-
 #include <boost/geometry.hpp>
 #include <boost/geometry/index/rtree.hpp>
 #include <boost/geometry/index/parameters.hpp>
@@ -22,13 +21,13 @@
 template<typename T = boost::geometry::model::point<float, 2, boost::geometry::cs::cartesian>, typename Param = boost::geometry::index::rstar<20, 10>>
 class Rtree
 {
-	using PointIdx = std::pair<T, int>;
+	using PointIdx = std::pair<T, unsigned>;
 	using Box = boost::geometry::model::box<T>;
 
 private:
 
 	boost::geometry::index::rtree<PointIdx, Param> rtree;
-	std::unordered_map<int, int> sizeClouds;
+	std::unordered_map<unsigned, unsigned> sizeClouds;
 	std::string name_ = "Rtree";
 
 
@@ -77,10 +76,10 @@ public:
 	// 1st Parameter: Query =  PointCloud
 	// 2nd Parameter: K = K Nearest Neighbors PointClouds
 	// 3rd Parameter: internalK = internalK-NN queries per point in PointCloud
-	std::vector<std::pair<int, int>> KNN(const Cloud<T>& queryCloud, const int k, const int internalK) const
+	std::vector<std::pair<unsigned, unsigned>> KNN(const Cloud<T>& queryCloud, const unsigned k, const unsigned internalK) const
 	{
 		std::vector<PointIdx> results;
-		std::unordered_map<int, int> count;
+		std::unordered_map<unsigned, unsigned> count;
 
 		// K queries for every point in the PointCloud
 		for (const auto& point : queryCloud.Points)
@@ -102,11 +101,11 @@ public:
 			numberResults = count.size();
 
 
-		std::vector<std::pair<int, int>> resultsID(numberResults);
+		std::vector<std::pair<unsigned, unsigned>> resultsID(numberResults);
 
 		// Get only the first K Point Clouds based in ID frequency.
 		std::partial_sort_copy(std::begin(count), std::end(count), std::begin(resultsID), std::end(resultsID),
-			[](const std::pair<int, int>& left, const std::pair<int, int>& right) {return left.second>right.second; });
+			[](const std::pair<unsigned, unsigned>& left, const std::pair<unsigned, unsigned>& right) {return left.second>right.second; });
 
 		return resultsID;
 	}
@@ -115,10 +114,10 @@ public:
 	// 1st Parameter: Query = PointCloud
 	// 2nd Parameter: Intersection Window (Box centered in  point)
 	// 3rd Parameter: Epsilon = Retrieve all Point Clouds with support > epsilon
-	std::vector<std::pair<int, float>> Intersection(const Cloud<T>& queryCloud, const float delta, const float epsilon) const
+	std::vector<std::pair<unsigned, float>> Intersection(const Cloud<T>& queryCloud, const float delta, const float epsilon) const
 	{
 		std::vector<PointIdx> results;
-		std::unordered_map<int, int> count;
+		std::unordered_map<unsigned, unsigned> count;
 
 		// Intersection query for every point in the PointCloud
 		for (const auto& point : queryCloud.Points)
@@ -140,20 +139,20 @@ public:
 			count[item.second]++;
 		}
 
-		std::vector<std::pair<int, float>> resultsPrelim(count.size());
+		std::vector<std::pair<unsigned, float>> resultsPrelim(count.size());
 
 		for (const auto& pair : count)
 		{
-			int id = pair.first;
+			unsigned id = pair.first;
 			auto it = sizeClouds.find(pair.first);
 			resultsPrelim.push_back(std::make_pair(pair.first, static_cast<float>(pair.second) / it->second));
 
 		}
 
 		std::sort(std::begin(resultsPrelim), std::end(resultsPrelim),
-			[](const std::pair<int, int>& left, const std::pair<int, int>& right) {return left.second>right.second; });
+			[](const std::pair<unsigned, unsigned>& left, const std::pair<unsigned, unsigned>& right) {return left.second>right.second; });
 
-		std::vector<std::pair<int, float>> resultsID;
+		std::vector<std::pair<unsigned, float>> resultsID;
 		resultsID.reserve(resultsPrelim.size());
 
 		// Select only the PointCloud with support greater than epsilon
@@ -174,7 +173,7 @@ public:
 	// 2nd Parameter: k = Nearest Neighbors
 	// 3rd Parameter: internalK = Internal k parameter for internalK-NN 
 	// 4th Parameter: recallAt = Vector for desired Recall@
-	template<typename D = std::chrono::milliseconds>PerformanceReport KNNPerformanceReport(const std::vector<Cloud<T>>& queryClouds, const int k, const int internalK, const std::vector<int>& recallAt) const
+	template<typename D = std::chrono::milliseconds>PerformanceReport KNNPerformanceReport(const std::vector<Cloud<T>>& queryClouds, const unsigned k, const unsigned internalK, const std::vector<unsigned>& recallAt) const
 	{
 		PerformanceReport performance;
 		performance.QueriesTime.reserve(queryClouds.size());

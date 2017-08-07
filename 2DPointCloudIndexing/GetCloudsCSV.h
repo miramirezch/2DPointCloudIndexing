@@ -15,9 +15,9 @@
 // 2nd Parameter: cmin - Minimum valid coordinate value
 // 3rd Parameter: cmax - Maximum valid coordinate value
 // 4th Parameter: header - Flag to indicate that file has a header row
-template<typename T> std::vector<Cloud<T>> ReadCSV(std::string fileName,int cmin ,int cmax, bool header)
-{	
-	std::unordered_map<int, std::vector<T>> pointCloudsMap;
+template<typename T> std::vector<Cloud<T>> ReadCSV(std::string fileName, int cmin, int cmax, bool header)
+{
+	std::unordered_map<unsigned, std::vector<T>> pointCloudsMap;
 
 	std::ifstream inputFile{ fileName };
 	std::string line;
@@ -46,9 +46,9 @@ template<typename T> std::vector<Cloud<T>> ReadCSV(std::string fileName,int cmin
 				temp.push_back(std::stof(item));
 			}
 
-			if (temp[0] >= 0 && temp[1] >= cmin && temp[2] >= cmin && temp[1]<=cmax && temp[2]<=cmax)
+			if (temp[0] >= 0 && temp[1] >= cmin && temp[2] >= cmin && temp[1] <= cmax && temp[2] <= cmax)
 			{
-				pointCloudsMap[static_cast<int>(temp[0])].push_back(T(temp[1], temp[2]));				
+				pointCloudsMap[static_cast<unsigned>(temp[0])].push_back(T(temp[1], temp[2]));
 			}
 
 		}
@@ -67,3 +67,6 @@ template<typename T> std::vector<Cloud<T>> ReadCSV(std::string fileName,int cmin
 
 	return pointClouds;
 }
+
+
+

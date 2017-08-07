@@ -1,19 +1,19 @@
 #pragma once
 #include "PerformanceReport.h"
 #include <algorithm>
+#include <cmath>
 #include <numeric>
 #include <iostream>
 #include <string>
-#include <cmath>
 // Miguel Ramirez Chacon
 // 19/05/17
 
 // Function to Get recall@k1,k2,...kn
-void GetRecall(PerformanceReport& results, const std::vector<std::pair<int, int>>& result, const std::vector<int>& recallAt, int cloudID)
+void GetRecall(PerformanceReport& results, const std::vector<std::pair<unsigned, unsigned>>& result, const std::vector<unsigned>& recallAt, unsigned cloudID)
 {
 	// Calculate position for Recall@
 	auto it = find_if(result.begin(), result.end(),
-		[ind = cloudID](const std::pair<int, int>& elemento) {return elemento.first == ind; });
+		[ind = cloudID](const std::pair<unsigned, unsigned>& elemento) {return elemento.first == ind; });
 
 	if (it != result.end())
 	{
@@ -30,11 +30,11 @@ void GetRecall(PerformanceReport& results, const std::vector<std::pair<int, int>
 }
 
 // Function to Get recall@k1,k2,...kn
-void GetRecall(PerformanceReport& results, const std::vector<std::pair<int, double>>& result, const std::vector<int>& recallAt, int cloudID)
+void GetRecall(PerformanceReport& results, const std::vector<std::pair<unsigned, double>>& result, const std::vector<unsigned>& recallAt, unsigned cloudID)
 {
 	// Calculate position for Recall@
 	auto it = find_if(result.begin(), result.end(),
-		[ind = cloudID](const std::pair<int, double>& elemento) {return elemento.first == ind; });
+		[ind = cloudID](const std::pair<unsigned, double>& elemento) {return elemento.first == ind; });
 
 	if (it != result.end())
 	{
@@ -75,11 +75,11 @@ void TimePerformance(PerformanceReport& report)
 	report.SDQueryTime = std::sqrt(var);
 }
 
-void PrintPerformanceReport(PerformanceReport& report,std::string name ,std::string timeUnits)
+void PrintPerformanceReport(PerformanceReport& report, std::string name, std::string timeUnits)
 {
 	std::cout << "-------------------------------------------------------------" << '\n';
 	std::cout << name << '\n';
-	std::cout <<"Query Time: Performance" << '\n';	
+	std::cout << "Query Time: Performance" << '\n';
 	std::cout << "Query Time - Average: " << report.AverageQueryTime << " " << timeUnits << std::endl;
 	std::cout << "Query Time - Standard Deviation: " << report.SDQueryTime << " " << timeUnits << '\n';
 	std::cout << "Query Time - Maximum: " << report.MaxQueryTime << " " << timeUnits << '\n';

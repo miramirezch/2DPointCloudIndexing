@@ -1,7 +1,7 @@
 #pragma once
 #include <utility>
-#include <unordered_map>
 #include "UtilityFunctions.h"
+#include <unordered_map>
 #include <string>
 #include <chrono>
 #include <functional>
@@ -20,11 +20,11 @@
 template<typename T>
 class VPT
 {
-	using PointIdx = std::pair<T, int>;	
+	using PointIdx = std::pair<T, unsigned>;
 
-private:	
+private:
 	VpTree<PointIdx> vpt;
-	std::unordered_map<int, int> sizeClouds;
+	std::unordered_map<unsigned, unsigned> sizeClouds;
 	std::string name_;
 
 public:
@@ -32,7 +32,7 @@ public:
 	VPT(std::string name) :name_{ name } {}
 
 	// Build index from vector of Point Clouds
-	void Build(const std::vector<Cloud<T>>& pointClouds, std::function<double(const T&, const T&)> dist)
+	void Build(const std::vector<Cloud<T>>& pointClouds, std::function<double(const std::pair<T, unsigned>&, const std::pair<T, unsigned>&)> dist)
 	{
 		std::vector<PointIdx> data;
 		int totalPoints = 0;
@@ -56,31 +56,27 @@ public:
 			}
 		}
 
-		auto distance = [d = dist](const PointIdx& e1, const PointIdx& e2) {
-			return d(e1.first, e2.first);
-		};
-
 		// Generate Index
-		vpt.Build(data, distance);
+		vpt.Build(data, dist);
 	}
 
-	std::string GetName(){return name_;}
+	std::string GetName() { return name_; }
 
 	// KNN Query
 	// 1st Parameter: Query =  PointCloud
 	// 2nd Parameter: K = K Nearest Neighbors PointClouds
 	// 3rd Parameter: internalK = internalK-NN queries per point in PointCloud
-	std::vector<std::pair<int, int>> KNN(const Cloud<T>& queryCloud, const int k, const int internalK) const
+	std::vector<std::pair<unsigned, unsigned>> KNN(const Cloud<T>& queryCloud, const unsigned k, const unsigned internalK) const
 	{
 		std::vector<PointIdx> results;
 		std::vector<double> distances;
-		std::unordered_map<int, int> count;
+		std::unordered_map<unsigned, unsigned> count;
 		auto i = 0;
 		// K queries for every point in the PointCloud
 		for (const auto& point : queryCloud.Points)
 		{
-			vpt.KNN(std::make_pair(point,1), internalK, results, distances);
-			
+			vpt.KNN(std::make_pair(point, 1), internalK, results, distances);
+
 			// Count the frequencies for the Clouds ID
 			for (const auto& item : results)
 			{
@@ -88,7 +84,7 @@ public:
 			}
 			results.clear();
 			distances.clear();
-		}			
+		}
 
 		auto numberResults = 0;
 
@@ -97,13 +93,13 @@ public:
 		else
 			numberResults = count.size();
 
-		std::vector<std::pair<int, int>> resultsID(numberResults);
+		std::vector<std::pair<unsigned, unsigned>> resultsID(numberResults);
 
 		// Get only the first K Point Clouds based in ID frequency.
 		std::partial_sort_copy(std::begin(count), std::end(count), std::begin(resultsID), std::end(resultsID),
-			[](const std::pair<int, int>& left, const std::pair<int, int>& right) {return left.second>right.second; });
+			[](const std::pair<unsigned, unsigned>& left, const std::pair<unsigned, unsigned>& right) {return left.second>right.second; });
 
-		return resultsID;		
+		return resultsID;
 	}
 
 	// Performance report on KNN Search
@@ -113,7 +109,7 @@ public:
 	// 2nd Parameter: k = Nearest Neighbors	
 	// 3rd Parameter: internalK = internalK-NN
 	// 3rd Parameter: recallAt = Vector for desired Recall@
-	template<typename Duration = std::chrono::milliseconds>PerformanceReport KNNPerformanceReport(const std::vector<Cloud<T>>& queryClouds, const int k, const int internalK,const std::vector<int>& recallAt) const
+	template<typename Duration = std::chrono::milliseconds>PerformanceReport KNNPerformanceReport(const std::vector<Cloud<T>>& queryClouds, const unsigned k, const unsigned internalK, const std::vector<unsigned>& recallAt) const
 	{
 		PerformanceReport performance;
 		performance.QueriesTime.reserve(queryClouds.size());
@@ -125,9 +121,9 @@ public:
 		{
 			// Perform KNN search
 			start = std::chrono::high_resolution_clock::now();
-			auto result = KNN(cloud, k, internalK);			
+			auto result = KNN(cloud, k, internalK);
 			end = std::chrono::high_resolution_clock::now();
-			
+
 			GetRecall(performance, result, recallAt, cloud.ID);
 
 			performance.QueriesTime.push_back(std::chrono::duration_cast<Duration>(end - start).count());
