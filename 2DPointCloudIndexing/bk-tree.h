@@ -31,8 +31,7 @@ template<typename T>
 class BkTree
 {
 private:
-	BKNode<T> root;
-	//	std::unique_ptr<BKNode<T>> root;
+	BKNode<T> root;	
 	std::function<unsigned(const T&, const T&)> distance;
 
 public:
@@ -40,15 +39,7 @@ public:
 
 	void Add(const T& data)
 	{
-		Add(BKNode<T>(data), root);
-		/*if (root == nullptr)
-		{
-		root = std::make_unique<BKNode<T>>(data);
-		}
-		else
-		{
-		Add(BKNode<T>(data), *root);
-		}*/
+		Add(BKNode<T>(data), root);		
 	}
 
 	void Add(BKNode<T>& data, BKNode<T>& node)
