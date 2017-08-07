@@ -46,6 +46,9 @@
     <Filter Include="LC">
       <UniqueIdentifier>{aef836a5-cd81-4393-8ff9-6152abeed7ee}</UniqueIdentifier>
     </Filter>
+    <Filter Include="IntegerReferences">
+      <UniqueIdentifier>{f215846e-8e3e-445a-bd13-c8349b4cf266}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Cloud.h">
@@ -118,6 +121,9 @@
   <ItemGroup>
     <ClCompile Include="Example.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IntegerReferences.cpp">
+      <Filter>IntegerReferences</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

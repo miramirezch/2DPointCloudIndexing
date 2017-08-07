@@ -120,6 +120,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Example.cpp" />
+    <ClCompile Include="IntegerReferences.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="bk-tree.h" />
