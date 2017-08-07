@@ -10,7 +10,20 @@
 // Miguel Ramirez Chacon
 // 28/05/17
 
-// Array based Vantage Point Tree
+/*/ Array based Vantage Point Tree
+@article{Yianilos,
+author = {Yianilos, P.N.},
+isbn = {0898713137},
+journal = {Proceedings of the fourth annual ACM-SIAM Symposium on Discrete algorithms},
+keywords = {Associative Memory,Clustering,Computational Geometry,Metric Space,Nearest Neighbor,Pattern Recognition,Randomized Methods},
+pages = {311--321},
+title = {{Data Structures and Algorithms for Nearest Neighbor Search in General Metric Spaces}},
+url = {http://dl.acm.org/citation.cfm?id=313789},
+year = {1993}
+}
+*/
+
+
 // Based on https://github.com/gregorburger/vp-tree (Pointer based)
 // T: Point class(2D)
 

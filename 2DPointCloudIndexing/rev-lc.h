@@ -12,21 +12,21 @@
 // Reverse Nearest Neighbor List of Clusters(Rev - LC)
 
 /*
-@inproceedings{SaditTellez:2012:LCR:2367875.2367898,
-author = {Sadit Tellez, Eric and Ch\'{a}vez, Edgar},
-title = {The List of Clusters Revisited},
-booktitle = {Proceedings of the 4th Mexican Conference on Pattern Recognition},
-series = {MCPR'12},
-year = {2012},
-isbn = {978-3-642-31148-2},
-location = {Huatulco, Mexico},
-pages = {187--196},
-numpages = {10},
-url = {http://dx.doi.org/10.1007/978-3-642-31149-9_19},
+@incollection{SaditTellez2012,
+annote = {GS: 2},
+author = {{Sadit Tellez}, Eric and Ch{\'{a}}vez, Edgar},
+booktitle = {Pattern Recognition},
 doi = {10.1007/978-3-642-31149-9_19},
-acmid = {2367898},
-publisher = {Springer-Verlag},
-address = {Berlin, Heidelberg},
+isbn = {9783642311482},
+issn = {03029743},
+keywords = {Indexing},
+mendeley-tags = {Indexing},
+pages = {187--196},
+publisher = {Springer Berlin Heidelberg},
+title = {{The List of Clusters Revisited}},
+url = {http://link.springer.com/10.1007/978-3-642-31149-9{\_}19},
+volume = {7329 LNCS},
+year = {2012}
 }
 */
 

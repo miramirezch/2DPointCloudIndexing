@@ -13,10 +13,26 @@
 // Miguel Ramirez Chacon
 // 28/05/17
 
-// Burkhard Keller Tree
-// Based on https://github.com/mkarlesky/csharp-bk-tree
-// T: Point class(2D)
+/* Burkhard Keller Tree
+@article{Burkhard1973,
+author = { Burkhard, W.A. and Keller, R.M. },
+doi = { 10.1145 / 362003.362025 },
+issn = { 00010782 },
+journal = { Communications of the ACM },
+keywords = { best match,file searching,file structuring,heuristics,matching },
+month = { apr },
+number = { 4 },
+pages = { 230--236 },
+publisher = { ACM },
+title = { { Some Approaches to Best - Match File Searching } },
+url = { http://portal.acm.org/citation.cfm?doid=362003.362025},
+volume = { 16 },
+year = { 1973 }
+}
+// Based on BKT from https://github.com/mkarlesky/csharp-bk-tree */
 
+
+// T: Point class(2D)
 template<typename T>
 struct BKNode
 {
@@ -31,8 +47,7 @@ template<typename T>
 class BkTree
 {
 private:
-	BKNode<T> root;
-	//	std::unique_ptr<BKNode<T>> root;
+	BKNode<T> root;	
 	std::function<unsigned(const T&, const T&)> distance;
 
 public:
@@ -40,15 +55,7 @@ public:
 
 	void Add(const T& data)
 	{
-		Add(BKNode<T>(data), root);
-		/*if (root == nullptr)
-		{
-		root = std::make_unique<BKNode<T>>(data);
-		}
-		else
-		{
-		Add(BKNode<T>(data), *root);
-		}*/
+		Add(BKNode<T>(data), root);		
 	}
 
 	void Add(BKNode<T>& data, BKNode<T>& node)

@@ -17,7 +17,8 @@
 // 21/05/17
 
 // Index for Point Clouds based in Reverse Nearest Neighbor List of Clusters(Rev - LC)
-// Eric Sadit Tellez, Eric and Edgar Chavez
+
+
 // T: Point class(2D)
 // D: Distance Function (Metric)
 

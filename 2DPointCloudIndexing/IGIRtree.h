@@ -13,7 +13,7 @@
 // Miguel Ramirez Chacon
 // 22/05/17
 
-// Index for Point Clouds based in combination of Inverted Grid Index and RTree
+// Index for Point Clouds based in Inverted Grid Index + RTree
 // T: Point class(2D)
 // Param: Rtree configuration
 

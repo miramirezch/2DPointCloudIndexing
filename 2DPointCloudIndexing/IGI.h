@@ -13,7 +13,26 @@
 // Miguel Ramirez Chacon
 // 19/05/17
 
-// Index for Point Clouds based in Inverted Grid Index
+/*/ Index for Point Clouds based in Inverted Grid Index
+@article{Ji2014,
+annote = {GS: 7
+11},
+author = {Ji, Changqing and Li, Zhiyang and Qu, Wenyu and Xu, Yujie and Li, Yuanyuan},
+doi = {10.1016/j.jnca.2014.05.010},
+issn = {10848045},
+journal = {Journal of Network and Computer Applications},
+keywords = {Big Data,Indexing,Inverted Grid Index,NN query,Spatial database},
+mendeley-tags = {Indexing},
+month = {sep},
+pages = {172--182},
+publisher = {Academic Press},
+title = {{Scalable nearest neighbor query processing based on Inverted Grid Index}},
+url = {http://linkinghub.elsevier.com/retrieve/pii/S1084804514001295},
+volume = {44},
+year = {2014}
+}
+*/
+
 // T: Point class(2D)
 
 template<typename T = boost::geometry::model::point<float, 2, boost::geometry::cs::cartesian>>
