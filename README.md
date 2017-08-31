@@ -1,18 +1,24 @@
 # 2DPointCloudIndexing
 
 ## Why 2D Point Cloud Indexing?
-TODO
+In recent years there has been a significant increase in the size of multimedia databases, and new databases of large size are created continuously. It is, therefore, of utmost importance the design of indexes and algorithms allowing efficient similarity queries. 
 
-## Applications
-TODO
+A large number of multimedia objects can be represented as a point cloud:
+* Images
+* Audio
+* Information of geographic systems
+* Points and polygons in CAD systems
+* Time series
+
+We propose data structures based on two solution schemes: indexes for point clouds based on inverted indexes and based on metric indexes. 
 
 ## Current Indexes
-* RTree for PointClouds
+* R*-Tree for PointClouds
 * Inverted Grid Index for PointClouds
-* Inverted Grid Index for PointClouds in Apache Spark (Pyspark - Spark SQL)
+* Inverted Grid Index for PointClouds - Apache Spark (Pyspark - Spark SQL)
 * ShazamHash: PointCloud index based on the paper: An Industrial-Strength Audio Search Algorithm - Wang 2003
 * Vantage Point Tree for PointClouds
-* Inverted Grid Index + Rtree for PointClouds
+* Inverted Grid Index + R*-Tree for PointClouds
 * Inverted Grid Index + Vantage Point Tree for PointClouds
 * Succinct Inverted Grid Index for PointClouds
 * Succinct Sarray + Vantage Point Tree for PointClouds
@@ -25,21 +31,9 @@ TODO
 ## Simple Demo
 Check out 2DPointCloudIndexing/Example.cpp
 
-## Documentation
-TODO
+## Recomended libraries for similarity search
 
-## Getting Started
-TODO
-
-## Benchmarks
-TODO
-
-## Licencing
-TODO
-
-## Recomended libraries
-
-For Similarity Search - Metric Space
+Metric Space
 
 Library | URL | Language 
 --- | --- | ---
@@ -47,7 +41,7 @@ SISAP | http://sisap.org/metricspaceslibrary.html | C, Java
 Natix | https://github.com/sadit/natix | C# (.NET Framework)
 Vantage Point Tree | https://github.com/gregorburger/vp-tree | C++
 
-For Similarity Search - Vector Space
+Vector Space
 
 Library | URL | Language 
 --- | --- | --- 
@@ -57,7 +51,7 @@ FLANN | https://github.com/mariusmuja/flann | C++
 nanoflann | https://github.com/jlblancoc/nanoflann | C++
 FALCONN | https://github.com/FALCONN-LIB/FALCONN | C++
 
-For Succinct Data Structures
+Succinct Data Structures
 
 Library | URL | Language 
 --- | --- | --- 
